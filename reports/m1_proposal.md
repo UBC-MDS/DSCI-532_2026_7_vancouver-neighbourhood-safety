@@ -3,16 +3,13 @@
 ## Section 1: Motivation and Purpose
 
 - **Our Role**: Data Science Consultants
-- **Target Audience**: In person and public occupancy rentals
+- **Target Audience**: Prospective renters and housing occupants in Vancouver
 
-With the cost of housing skeralding in the different regions and neighborhoods across Vancouver, potential residents are constantly in dire need to verify the safety levels and crime situations associated with their proposed residential interest before contracting their leases. Hence to enable prospects make informed and sufficient decisions, we are providing our **Vancouver Crime Watch Dashboard application (VCW app)**. **VCW** would provide insights into the crime severity levels associated with Neigborhoods and even granularity to blocks. Our primary goal is to help our users establish or scrutinize their futuristic residences, so they can establish precautionary measures or better still avoid renting there.
+With the cost of housing skyrocketing across different regions and neighborhoods in Vancouver, potential residents are in dire need of reliable ways to verify the safety levels and crime situations associated with areas they are considering before signing a lease or procuring that property. Renting is a major financial commitment, and choosing the wrong neighborhood could significantly affect both safety and quality of life.
 
+To help prospects make informed decisions, we are presenting **The Vancouver Crime Watch Dashboard Application (VCW App)**. **VCW App** will provide insights into the crime severity levels across neighborhoods, with granularity down to specific areas or blocks. Users will be able to explore crime patterns, filter by crime type or location, and compare different neighborhoods.
 
-Briefly explain the "Why":
-
-Target Audience: Who are they and what role are you embodying?
-Problem: What challenge are they facing?
-Solution: How will your dashboard help them solve it?
+By providing clear visual findings, our app empowers users to make informed rental decisions, assess safety risks, and take appropriate precautionary measures or avoid high-risk areas altogether.
 
 ## Section 2: Description of the Data
 Describe the dataset you finalized in Step 1.
