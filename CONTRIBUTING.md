@@ -1,6 +1,6 @@
 # Contributing to the Vancouver Crime Watch project
 
-This file outlines how to propose changes to the Heart Failure Classification project. 
+This file outlines how to propose changes to the Vancouver Crime heart project. 
 
 ### Fixing typos
 
