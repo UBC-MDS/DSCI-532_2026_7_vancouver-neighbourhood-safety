@@ -3,8 +3,9 @@
 ## Section 1: Motivation and Purpose
 
 - **Our Role**: Data Science Consultants
-- **Target Audience**: In person and public rentals
+- **Target Audience**: In person and public occupancy rentals
 
+With the cost of housing skeralding in the different regions and neighborhoods across Vancouver, potential residents are constantly in dire need to verify the safety levels and crime situations associated with their proposed residential interest before contracting their leases. Hence to enable prospects make informed and sufficient decisions, we are providing our **Vancouver Crime Watch Dashboard application (VCW app)**. **VCW** would provide insights into the crime severity levels associated with Neigborhoods and even granularity to blocks. Our primary goal is to help our users establish or scrutinize their futuristic residences, so they can establish precautionary measures or better still avoid renting there.
 
 
 Briefly explain the "Why":
