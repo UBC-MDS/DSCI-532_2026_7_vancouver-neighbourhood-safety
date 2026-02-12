@@ -8,10 +8,52 @@ Problem: What challenge are they facing?
 Solution: How will your dashboard help them solve it?
 
 ## Section 2: Description of the Data
-Describe the dataset you finalized in Step 1.
+ 
+**Data set:** *Vancouver Crime Data 2025–2026 – Vancouver Police Department*
 
-Stats: Number of rows/columns.
-Relevance: How variables potentially link to the problem.
+The source dataset will contain approximately 36,000 registered crime activities (32,411 occurred during 2025 and 3,000+ for 2026, depending on the cut-off date). It contains 10 attributes detailing the reported crime event activity. Additionally, we plan to derive and augment new variables from the source data, such as crime severity based on the crime “type” (CRIME_SEVERITY), suggested city regions (REGION), and times of day providing “morning”, “afternoon”, and “night” segmentation (PART_OF_DAY). Furthermore, if time permits, we may include a parallel catalogue of population-per-neighbourhood data to calculate crime rates per capita.
+
+We envision making use of most of the variables from the original dataset to provide the visibility and usability proposed for the dashboard: spatial and temporal analysis of crime levels across locations, times of day, and crime categories, as well as analysis of rates across different locations.
+
+Here's a brief description of the 10 default variables:
+
+**TYPE**  
+Text field specifying the type of crime activity, as classified by the VPD.
+
+**YEAR**  
+Numeric field indicating the year in which the crime activity occurred. Four-digit format.
+
+**MONTH**  
+Numeric field indicating the month in which the crime activity occurred. Two-digit format.
+
+**DAY**  
+Numeric field indicating the day of the month on which the crime activity occurred. Two-digit format.
+
+**HOUR**  
+Numeric field indicating the hour (24-hour notation) at which the crime activity occurred. Two-digit format.
+
+**MINUTE**  
+Numeric field indicating the minute at which the crime activity occurred. Two-digit format.
+
+**HUNDRED_BLOCK**  
+Masked address indicating the block of the street where the crime activity occurred.  
+
+   **Important:** According to the data source owner, crime activities related to offences against a person were deliberately randomized to certain blocks and offset to intersections. Incidents with unknown locations are indicated as “X NK_LOC ST”.
+
+**NEIGHBOURHOOD**  
+Text field specifying the name of the neighbourhood where the crime activity occurred. This field follows the Statistics Canada definition of neighbourhoods within the City of Vancouver, based on the Census Tracts (CT) concept.
+
+**X**  
+Offset X-coordinate value where the crime activity occurred, using the UTM Zone 10 projection.
+
+**Y**  
+Offset Y-coordinate value where the crime activity occurred, using the UTM Zone 10 projection.
+
+
+##### Reference:
+- Vancouver Police Department (VPD) - Crime Data Download.
+- https://geodash.vpd.ca/opendata/
+
 
 ## Section 3: Research Questions & Usage Scenarios
 **Persona**
