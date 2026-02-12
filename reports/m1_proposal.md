@@ -14,11 +14,23 @@ Stats: Number of rows/columns.
 Relevance: How variables potentially link to the problem.
 
 ## Section 3: Research Questions & Usage Scenarios
-Detail how the audience will interact with the app.
+**Persona**
 
-Persona: Brief description of a user.
-Usage Scenario create a narrative describing user needs and context.
-User Stories / JTBD: Provide at least 3 User Stories or Job Stories that outline specific tasks the user needs to perform.
+John Smith is a father of two young children who is relocating to Vancouver, Canada for work. He is unfamiliar with the city's neighbourhoods and wants to ensure that he chooses a safe area to rent or buy a home. He understands that the Vancouver Police Department (VPD) has a database of all crime that happens in the city for the whole year, however he does not wish to view raw statistics but would instead prefer clear, visual summaries. John's main concern when looking for a home is neighbourhood safety, particularly crimes that could directly affect his children.
+
+**Usage Scenario**
+
+John is exploring home listings on rental platforms. However, he realizes that he does not recognize most neighbourhood names and has no intuitive sense if they are safe neighbourhoods. He would like to compare neighbourhood safety objectively using actual crime rates, instead of relying solely on subjective opinions from online forums.
+
+Using the dashboard, John can view an interactive map of Vancouver that visually highlights neighbourhoods based on overall crime rates. He can apply filters to focus on specific crime categories that are most relevant to his family’s safety, allowing him to assess which areas may pose greater concern for his young children. John is also able to explore crime patterns by time of day to understand whether incidents tend to occur during the afternoon when his children might be home from school.
+
+The dashboard allows John to narrow his shortlist to neighbourhoods that align with his family’s safety priorities and gives him greater confidence in his housing decision.
+
+**User Stories**
+
+1. **View neighbourhood crime levels on a map**: As a newcomer unfamiliar with Vancouver neighbourhoods, I want to view an interactive map that displays crime levels by neighbourhood so that I can visually compare areas and better understand where higher or lower crime concentrations are located.
+2. **Understand crime patterns by time of day**: As a parent with young children, I want to see when crimes most frequently occur (morning, afternoon, evening, night) so that I can assess whether incidents tend to happen during times when my children may be home.
+3. **View crime rates adjusted for neighbourhood population size**: As someone comparing neighbourhoods of different sizes, I want to see crime rates normalized by population so that I can make fair comparisons between larger and smaller areas.
 
 ## Section 4: Exploratory Data Analysis
 Demonstrate that your data can actually support your user stories.
@@ -31,5 +43,5 @@ In your proposal document (this section), briefly explain what the visualization
 
 
 ## Section 5: App Sketch & Description
-Sketch: A visual mockup showing layout and components (hand-drawn or software-generated). Save it as img/sketch.png and embed it in your proposal markdown file (e.g., ![Sketch](../img/sketch.png)).
-Description: High-level explanation of interface components and interactions (landing page, filters, charts).
+![Sketch](../img/sketch.png)
+The landing page of the dashboard opens provides a high-level overview of crime patterns across Vancouver neighbourhoods, featuring KPI cards that summarize total incidents, crime rate, city average comparison, and month-over-month change. Users can apply filters on the left panel to select neighbourhood, crime type, month, and time of day to update the visuals accordingly. The heat map of the City of Vancouver provides geographic context by highlighting crime intensity across neighbourhoods. The supporting charts display different metrics that are useful for the user (i.e. crime counts by type and the distribution of incidents by time of day). Together, this dashboard allow users to explore safety trends in the City of Vancouver to support informed housing decisions.
