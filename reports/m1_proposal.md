@@ -33,11 +33,28 @@ The dashboard allows John to narrow his shortlist to neighbourhoods that align w
 3. **View crime rates adjusted for neighbourhood population size**: As someone comparing neighbourhoods of different sizes, I want to see crime rates normalized by population so that I can make fair comparisons between larger and smaller areas.
 
 ## Section 4: Exploratory Data Analysis
-To address User Story 2 (**Understand crime patterns by time of day**), we analyzed how crime occurrences are distributed across different periods and categories within Vancouvers neighborhood.
+To address User Story 2 (**Understand crime patterns by time of day**), we analyzed how crime occurrences are distributed across different periods and categories within Vancouver's neighborhood.
 
-### Context:
-John has heard wonderful stories about Stanley Park, its lush greenery and its walkways make it a dream location for his wife and two children, who love to walk and bike. However, John values data over hearsay. He wants to ensure the reality of the neighborhood matches its reputation.
+### 4.1 Context:
+John has heard wonderful stories about Stanley Park, its lush greenery and walkways make it a dream location for his wife and two children, who love to walk and bike. However, John values data over hearsay. He wants to ensure the reality of the neighborhood matches its reputation.
 
+### 4.2 Analysis
+By filtering the VPD dataset specifically for Stanley Park in [notebooks/eda_analysis.ipynb]--(Update-remember to insert the link here)--, we can see two critical trends that could influence his decision:
+
+- **Crime Type Distribution**: The bar chart shows that `Theft from Vehicle` is the most frequent occurrence. For a father of two, this provides a practical warning about his vehicle and a clear signal to prioritize secure parking. Also, `Offence Against a Person` ranks lower, suggesting that while vehicle crime is a factor, physical safety for pedestrians is somewhat higher, an indicator for a family who loves walking.
+<p align="center">
+  <img src="../img/barplot.png" width="600">
+</p>
+
+
+- **Daily Patterns**: The donut chart shows a heavy skew toward the Afternoon (52.1%), with the Morning (18.4%) having the lowest value. John now knows that if **he’s considering residence in this neighborhood, he must be extra vigilant about securing his vehicle and belongings** during the peak hours.
+<p align="center">
+  <img src="../img/donutplot.png" width="600">
+</p>
+
+### 4.3 Reflection
+This data supports John’s decision-making by replacing `"wonderful stories"` with actionable insights. Knowing that over half of the incidents occur in the afternoon allows John to be more `"street smart"`. For example, ensuring no bags are left visible in the car during their afternoon bike rides, or even obtaining solid car locks.
+The dashboard demonstrates that while Stanley Park has high property crime (theft), it maintains a profile that might still be acceptable for John’s family priorities. This analysis proves our dashboard can help a newcomer objectively compare their lifestyle needs against observed security and crime patterns.
 
 
 ## Section 5: App Sketch & Description
