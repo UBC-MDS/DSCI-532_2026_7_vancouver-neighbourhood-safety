@@ -15,9 +15,11 @@ Relevance: How variables potentially link to the problem.
 
 ## Section 3: Research Questions & Usage Scenarios
 **Persona**
+
 John Smith is a father of two young children who is relocating to Vancouver, Canada for work. He is unfamiliar with the city's neighbourhoods and wants to ensure that he chooses a safe area to rent or buy a home. He understands that the Vancouver Police Department (VPD) has a database of all crime that happens in the city for the whole year, however he does not wish to view raw statistics but would instead prefer clear, visual summaries. John's main concern when looking for a home is neighbourhood safety, particularly crimes that could directly affect his children.
 
 **Usage Scenario**
+
 John is exploring home listings on rental platforms. However, he realizes that he does not recognize most neighbourhood names and has no intuitive sense if they are safe neighbourhoods. He would like to compare neighbourhood safety objectively using actual crime rates, instead of relying solely on subjective opinions from online forums.
 
 Using the dashboard, John can view an interactive map of Vancouver that visually highlights neighbourhoods based on overall crime rates. He can apply filters to focus on specific crime categories that are most relevant to his family’s safety, allowing him to assess which areas may pose greater concern for his young children. John is also able to explore crime patterns by time of day to understand whether incidents tend to occur during the afternoon when his children might be home from school.
