@@ -1,6 +1,6 @@
-# Contributing to the Vancouver Crime Watch project
+# Contributing to the Vancouver Neighbourhood Safety Dashboard project
 
-This file outlines how to propose changes to the Vancouver Crime heart project. 
+This file outlines how to propose changes to the Vancouver Neighbourhood Safety Dashboard project. 
 
 ### Fixing typos
 
