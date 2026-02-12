@@ -1,25 +1,17 @@
 from shiny import App, ui
 
-# app_ui = ui.page_fillable(
-#     ui.layout_columns(
-#         ui.card("Summary of Crime Statistics in Vancouver"),
-#         ui.card("Distribution of Crime Types in Vancouver"),
-#         ui.card("Crime Severity Rate Across Neighborhoods in Vancouver"),
-#         col_widths=(2, 4, 6),
-#     ),
-# )
-
 app_ui = ui.page_sidebar(
     ui.sidebar(
         ui.input_select("neighbourhood", "Neighbourhood",
             ["All", "Milestone 1", "Milestone 2"]),
         ui.input_select("crime_type", "Crime Type",
-            ["All teams", "Team 01", "Team 02"]),
+            ["All Crime Types", "Team 01", "Team 02"]),
         ui.input_select("month", "Month",
             ["All", "January", "February", "March", "April", "May", "June", "July", "August",
             "September", "October", "November", "Decemeber"]),
         ui.input_select("daily_time", "Time of Day",
             ["All", "Morning", "Afternoon", "Evening"]),
+        full_screen=True
     ),
     ui.layout_columns(
         ui.value_box("Reported Incidents", "259"),
@@ -29,28 +21,26 @@ app_ui = ui.page_sidebar(
         fill=False,
     ),
     ui.layout_columns(
-        ui.card(ui.card_header(ui.strong("Crime Map by Neigbourhood")), full_screen=True),
-        
+        ui.card(
+            ui.card_header(ui.strong("Crime Map by Neigbourhood")), 
+            full_screen=True
+            ),
         ui.layout_columns(
             ui.card(
                 ui.card_header(ui.strong("Count of Crime Type")), 
                 full_screen=True,
-                #class_="flex-fill"
                 ),
             ui.card(
                 ui.card_header(ui.strong("Crime by Time of Day")), 
                 full_screen=True,
-                #class_="flex-fill"
                 ),
             col_widths=[12,12],
             fill=True
-            #class_="d-flex flex-column gap-3"
         ),
         col_widths=[7, 5],
         ),
-    title="Vancouver Neighbourhood Safety", fillable=True,
+    title=ui.tags.h2("Vancouver Neighbourhood Safety", style="font-weight: bold;"), fillable=True,
 )
-
 
 
 def server(input, output, session):
@@ -61,30 +51,3 @@ app = App(app_ui, server=server)
 
 
 
-#ui.card_header("Count of Crime Type"), full_screen=True
-
-
-# ui.layout_columns(
-#         ui.card(ui.card_header("Crime Map by Neigbourhood"), full_screen=True),
-        
-#         ui.div(
-#             ui.card(
-#                 ui.card_header("Count of Crime Type"), 
-#                 full_screen=True,
-#                 style="flex: 1;"
-#                 ),
-                
-#             ui.card(
-#                 ui.card_header("Crime by Time of Day"), 
-#                 full_screen=True,
-#                 style="flex: 1;"
-#                 ),
-#         style="""
-#             display: flex;
-#             flex-direction: column;
-#             height: 100vh;
-#             gap: 1rem;
-#         """
-#         ),
-#         col_widths=[7, 5],
-#         )
