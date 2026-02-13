@@ -1,8 +1,16 @@
-name: vc_safety
+name: vc_safety2
 channels:
   - conda-forge
 dependencies:
-  - python=3.11
   - pip
+  - python=3.11
+  - jupyterlab=4.5
+  - pandas=3.0
+  - seaborn=0.13
+  - plotly=6.5
+  - numpy=2.4
+  - matplotlib=3.10
+  - ipywidgets=8.1
+  - ipython=9.10
   - pip:
     - shiny==1.5.1
