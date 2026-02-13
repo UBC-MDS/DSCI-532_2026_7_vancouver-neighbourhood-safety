@@ -2,6 +2,24 @@
 
 The Vancouver Neighbourhood Safety dashboard was developed to provide an interactive overview of crime patterns across different neighbourhoods in Vancouver, Canada. The dashboard allows users to explore crime rates based on different breakdowns including neighbourhoods, crime types, and time patterns. Designed with home searchers in mind, it transforms crime data from the Vancouver Police Department (VPD) into clear visual comparisons, helping users better understand neighbourhood safety and make more informed housing decisions.
 
+## Installation
+
+To reproduce the environment, navigate to the root of the project dirctory and run:
+
+``` bash
+conda env create -f environment.yml
+conda activate vc_safety2
+```
+
+## Render the app
+
+To render the app, navigate to the root of the project directory and run:
+
+``` bash
+shiny run src/app.py
+```
+
+Open http://127.0.0.1:8000 in a web browser
 
 ## Data Attribution
 This project uses dataset provided by the City of Vancouver and the Vancouver Police Department.
