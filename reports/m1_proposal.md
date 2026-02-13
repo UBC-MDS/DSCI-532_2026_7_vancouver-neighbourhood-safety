@@ -1,4 +1,4 @@
-# Proposal - Vancouver Crime Watch
+# Proposal - Vancouver Neighbourhood Safety dashboard
 
 ## Section 1: Motivation and Purpose
 Briefly explain the "Why":
