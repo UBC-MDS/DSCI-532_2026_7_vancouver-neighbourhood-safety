@@ -1,0 +1,4 @@
+shiny==1.5.1
+geopandas==1.1.2
+pandas==3.0.1
+
