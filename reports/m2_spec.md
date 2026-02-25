@@ -7,7 +7,8 @@
 
 
 # Reactivity Diagram
-```mermaid flowchart TD
+```mermaid 
+flowchart TD
     A[/input_nbhd/] --> F{{filtered_df}}
     B[/input_crime_type/] --> F
     C[/input_crime_month/] --> F
@@ -20,7 +21,6 @@
     F --> K3[kpi_avg_comparison]
     F --> K4[kpi_mom_change]
 ```
-
 
 
 # Calculation Details
