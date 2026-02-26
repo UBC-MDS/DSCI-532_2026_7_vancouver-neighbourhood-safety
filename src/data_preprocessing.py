@@ -53,5 +53,5 @@ def data_preprocess(file_path):
 
 
 if __name__ == "__main__":
-    df = data_preprocess('../data/raw/crimedata_csv_AllNeighbourhoods_2025.csv')
-    print('Data Preprocessing Completed')
+    df = data_preprocess('data/raw/crimedata_csv_AllNeighbourhoods_2025.csv')
+    print('---Data Preprocessing Completed---')
