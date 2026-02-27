@@ -40,8 +40,14 @@ flowchart TD
     KPIS --> K1([kpi_rep_incidents])
     KPIS --> K2([kpi_crime_rate])
     KPIS --> K3([kpi_avg_comparison])
-    KPIS --> K4([kpi_mom_change])
+    KPIS --> K4([kpi_neighbourhood_rank])
 ```
 
 
 # Calculation Details
+
+| Reactive Calculation      | Inputs it Depends On | Transformation Performed | Outputs Consuming Reactive Calculation |
+|---------------------------|---------------------|--------------------------|----------------------------------------|
+| `filtered_data()` | `input.nb`, `input.crime_type`, `input.month`, `input.daily_time` | Filters the crime dataset to match the selected neighbourhood, crime type, month, and time-of-day selections. | `crime_count`, `crime_rate`, `average_comparison` |
+| `filtered_population()` | `input.nb` | Returns the population of the selected neighbourhood. | `crime_rate`, `average_comparison` |
+| `neighbourhood_ranking()` | `input.nb`, `input.crime_type`, `input.month`, `input.daily_time` | Applies the selected filters, calculates crime counts per neighbourhood then converts them into population-adjusted crime rates. Returns the rank of the neighbourhoods sorted by crime rate. | `neighbourhood_rank` |
