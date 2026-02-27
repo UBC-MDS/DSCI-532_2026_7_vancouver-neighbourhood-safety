@@ -3,15 +3,49 @@ from shinywidgets import render_plotly, output_widget
 import pandas as pd
 import altair as alt
 alt.data_transformers.disable_max_rows()
+import folium
+from folium.plugins import HeatMap
+import geopandas as gpd
+from pyproj import Transformer
+import plotly.express as px
+from shinywidgets import output_widget, render_widget
+
 
 crime_df = pd.read_csv("data/processed/processed_vancouver_crime_data_2025.csv")
 population_df = pd.read_csv("data/raw/van_pop_2016.csv")
+
+# Load neighbourhood polygons
+neigh_gdf = gpd.read_file("data/processed/merged_vancity.gpkg",
+                          layer="merged_vancity")
+
+# Latitude and Longitude compatibility with Leaflet/Folium
+neigh_gdf = neigh_gdf.to_crs(epsg=4326)
+
 
 # Input options for the dropdowns
 neighbourhoods = ["All"] + sorted(crime_df["NEIGHBOURHOOD"].unique())
 crime_types = ["All"] + sorted(crime_df["TYPE"].unique())
 months = ["All", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-time_of_day = ["All", "Morning", "Afternoon", "Evening"]
+time_of_day = ["All", "Morning", "Afternoon", "Evening/Night"]
+
+def neigh_style(_feature):
+    return {
+        "fillOpacity": 0.05,
+        "weight": 1,
+    }
+
+def neigh_style_default(_feature):
+    return {
+        "fillOpacity": 0.03, 
+        "weight": 1
+    }
+
+def neigh_style_selected(_feature):
+    return {
+        "fillOpacity": 0.18, 
+        "weight": 3
+    }
+
 
 app_ui = ui.page_sidebar(
     ui.sidebar(
@@ -34,12 +68,16 @@ app_ui = ui.page_sidebar(
     ),
     ui.layout_columns(
         ui.card(
-            ui.card_header(ui.strong("Crime Map by Neigbourhood")), 
+            ui.card_header(ui.strong("Crime Map by Neigbourhood")),
+            ui.output_ui("crime_map"),
+            style="height: 100%; width: 100%;",
             full_screen=True
             ),
         ui.layout_columns(
             ui.card(
-                ui.card_header(ui.strong("Count of Crime Type")), 
+                # ui.card_header(ui.strong("Count of Crime Type")),
+                ui.card_header(ui.strong("Top Crime Types")),
+                output_widget("top_crime_type_bar"),
                 full_screen=True,
                 ),
             ui.card(
@@ -190,5 +228,298 @@ def server(input, output, session):
         )
 
         return pie_chart
+
+    @reactive.calc
+    def filtered_latlon():
+        df = filtered_data()
+
+        # Validate numeric values and drop missing coordinates
+        xy = df[["X", "Y"]].copy()
+        xy["X"] = pd.to_numeric(xy["X"], errors="coerce")
+        xy["Y"] = pd.to_numeric(xy["Y"], errors="coerce")
+        xy = xy.dropna()
+
+        if xy.empty:
+            return pd.DataFrame(columns=["lat", "lon"])
+        
+        # Source UTM Zone 10N WGS84 EPSG:32610 to WGS84 lat/lon EPSG:4326
+        transformer = Transformer.from_crs("EPSG:32610", "EPSG:4326", always_xy=True)
+
+        lons, lats = transformer.transform(xy["X"].to_numpy(), xy["Y"].to_numpy())
+        out = pd.DataFrame({"lat": lats,
+                            "lon": lons})
+        
+        # Metro Vancouver bounds
+        out = out[
+            out["lat"].between(49.0, 49.4) &
+            out["lon"].between(-123.3, -122.9)
+        ]
+
+        return out
+    
+    @reactive.calc
+    def selected_neigh_bounds():
+        nb = input.nb()
+        if nb == "All":
+            return None
+        
+        neigh = neigh_gdf[neigh_gdf["Name"] == nb]
+        if neigh.empty:
+            return None
+        
+        minx, miny, maxx, maxy = neigh.total_bounds
+        return [[miny, minx], [maxy, maxx]]
+
+    @reactive.calc
+    def neighbourhood_rates():
+        df = filtered_data()
+
+        # Get crime counts by neighbourhood
+        counts = (
+            df.groupby("NEIGHBOURHOOD")
+            .size()
+            .reset_index(name="incident_count")
+        )
+
+        # Join incident counts with population data
+        merged = counts.merge(
+            population_df[["NEIGHBOURHOOD", "POPULATION"]],
+            on="NEIGHBOURHOOD",
+            how="left"
+        )
+
+        # Division by zero or missing values
+        merged = merged.dropna(subset=["POPULATION"])
+        merged = merged[merged["POPULATION"] > 0]
+
+        merged["rate_per_1000"] = (
+            merged["incident_count"] / merged["POPULATION"]
+        ) * 1000
+
+        return merged
+    
+    @reactive.calc
+    def filetered_data_no_crime_type():
+        df = crime_df.copy()
+        nb = input.nb()
+        month = input.month()
+        daily_time = input.daily_time()
+
+        if nb != "All":
+            df = df[df["NEIGHBOURHOOD"] == nb]
+
+        if month != "All":
+            df = df[df["MONTH_NAME"] == month]
+
+        if daily_time != "All":
+            df = df[df["TIME_OF_DAY"] == daily_time]
+        
+        return df
+
+    @reactive.calc
+    def top_crime_types():
+        df = filetered_data_no_crime_type()
+
+        top = (
+            df.groupby("TYPE")
+            .size()
+            .sort_values(ascending=False)
+            .head(5)
+        )
+
+        return top
+
+    @render_widget
+    def top_crime_type_bar():
+        top = top_crime_types()
+
+        if top.empty:
+            fig = px.bar(title="No data for current filters")
+            return fig
+
+        # Convert Series to DataFrame
+        df_top = top.reset_index()
+        df_top.columns = ["Crime Type", "Incidents"]
+
+        # Compute percent share
+        total_incidents = df_top["Incidents"].sum()
+        df_top["Percent Share"] = (df_top["Incidents"] / total_incidents) * 100
+
+        # Reverse for horizontal ordering (largest on top)
+        #df_top = df_top.sort_values("Incidents")
+        df_top = df_top.sort_values("Percent Share")
+
+        fig = px.bar(
+            df_top,
+            # x="Incidents",
+            x="Percent Share",
+            y="Crime Type",
+            orientation="h",
+            # text="Incidents",
+            text=df_top["Percent Share"].map(lambda x: f"{x:.1f}%"),
+            color="Percent Share",
+            color_continuous_scale="Teal", # "YlOrRd",
+            # title="Top 5 Crime Types (% share)",
+            subtitle="(All filters except Crime Type)",
+        )
+
+        fig.update_layout(
+            template="plotly_white",
+            height=400,
+            margin=dict(l=180, r=30, t=50, b=0, pad=0),
+            xaxis_title="Percent of Incidents",
+            yaxis_title="",
+            coloraxis_showscale=False,
+            yaxis=dict(automargin=False),
+
+        )
+
+        fig.update_traces(textposition="outside", 
+                          cliponaxis=False)
+
+        return fig
+
+
+    @render.ui
+    def crime_map():
+        vancity_center = [49.2827, -123.1207]
+        nb = input.nb()
+        rates = neighbourhood_rates()
+        
+        # Map base
+        m = folium.Map(
+            location=vancity_center,
+            zoom_start=12,
+            tiles="CartoDB positron",
+            width="100%",
+            height="100%",
+        )
+
+        # Add neighbourhood polygons (default style)
+        folium.GeoJson(
+            neigh_gdf.__geo_interface__,
+            name="Neighbourhoods",
+            style_function=neigh_style_default,
+        ).add_to(m)
+
+        # Highlight selected neighbourhood
+        if nb != "All":
+            sel_neigh = neigh_gdf[neigh_gdf["Name"] == nb]
+            if not sel_neigh.empty:
+                folium.GeoJson(
+                    sel_neigh.__geo_interface__,
+                    name=f"Selected: {nb}",
+                    style_function=neigh_style_selected,
+                ).add_to(m)
+
+        # Add crime Heatmap and Points layers based on X/Y (lat/lon)
+        # Define toggleable layers
+       
+        # Heatmap layer (default on)
+        heat_layer = folium.FeatureGroup(name="Heatmap", show=True)
+
+        points = filtered_latlon()
+        heat_data = points[["lat", "lon"]].values.tolist()
+
+        if heat_data:
+            HeatMap(
+                heat_data,
+                # name="Crime Heatmap",
+                radius=14,
+                blur=18,
+                max_zoom=13,
+            # ).add_to(m)
+            ).add_to(heat_layer)
+        
+        heat_layer.add_to(m)
+        
+        # Points layer (optional)
+        points_layer = folium.FeatureGroup(name="Points", show=False)
+
+        max_points = 2000
+        points_for_markers = points.head(max_points)
+
+        for lat, lon in points_for_markers[["lat", "lon"]].values:
+            folium.CircleMarker(
+                location=[lat, lon],
+                radius=3,
+                weight=1,
+                fill=True,
+                fill_opacity=0.4,
+            ).add_to(points_layer)
+        
+        points_layer.add_to(m)
+
+        # Choropleth layer for crime rates by neighbourhood
+        
+        # Merge rates into polygons
+        gdf_rate = neigh_gdf.merge(
+            rates,
+            left_on="Name",
+            right_on="NEIGHBOURHOOD",
+            how="left"
+        )
+
+        gdf_rate["incident_count"] = gdf_rate["incident_count"].fillna(0)
+        gdf_rate["rate_per_1000"] = gdf_rate["rate_per_1000"].fillna(0)
+
+        folium.Choropleth(
+            geo_data=gdf_rate.__geo_interface__,
+            data=gdf_rate[["Name", "rate_per_1000"]],
+            columns=["Name", "rate_per_1000"],
+            key_on="feature.properties.Name",
+            name="Rate per 1,000 residents",
+            fill_color="YlOrRd",
+            fill_opacity=0.6,
+            line_opacity=0.3,
+            legend_name="Incidents per 1,000 residents",
+            show=False
+        ).add_to(m)
+
+        # Zoom map to selected neighbourhood
+        bounds = selected_neigh_bounds()
+        if bounds is not None:
+            m.fit_bounds(bounds)
+
+        folium.LayerControl(collapsed=True).add_to(m)
+        
+        toggle_legend_js = """
+        <script>
+        (function() {
+        function syncLegend() {
+            // Choropleth legend is usually a branca legend with class "legend"
+            const legend = document.querySelector('.legend');
+            if (!legend) return false;
+
+            // Find the overlay checkbox by its label text
+            const labels = Array.from(document.querySelectorAll('.leaflet-control-layers-overlays label'));
+            const target = labels.find(l => l.textContent.trim() === 'Rate per 1,000 residents');
+            if (!target) return false;
+
+            const cb = target.querySelector('input[type="checkbox"]');
+            if (!cb) return false;
+
+            // Set initial state + bind updates
+            legend.style.display = cb.checked ? 'block' : 'none';
+            cb.addEventListener('change', () => {
+            legend.style.display = cb.checked ? 'block' : 'none';
+            });
+
+            return true;
+        }
+
+        // Try a few times because Leaflet controls/legend load after map HTML inserts
+        let tries = 0;
+        const timer = setInterval(() => {
+            tries += 1;
+            if (syncLegend() || tries > 25) clearInterval(timer);
+        }, 200);
+        })();
+        </script>
+        """
+        m.get_root().html.add_child(folium.Element(toggle_legend_js))
+
+        return ui.HTML(m._repr_html_())
+
 
 app = App(app_ui, server=server)
