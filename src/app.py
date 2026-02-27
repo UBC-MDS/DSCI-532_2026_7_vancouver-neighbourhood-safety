@@ -43,9 +43,12 @@ app_ui = ui.page_sidebar(
                 full_screen=True,
                 ),
             ui.card(
-                ui.card_header(ui.strong("Crime by Time of Day")), 
-                output_widget("time_of_day_plot"),
+                ui.card_header(ui.strong("Crime Occurrences By Time of Day")), 
+                ui.card_body(output_widget("time_of_day_plot", width="100%", height="100%"),
+                fill=True,
+                ),
                 full_screen=True,
+                fill=True
                 ),
             col_widths=[12,12],
             fill=True
@@ -153,11 +156,24 @@ def server(input, output, session):
 
         ).encode(
             theta=alt.Theta('count:Q', stack=True),
-            color=alt.Color('TIME_OF_DAY:N', scale=alt.Scale(range=custom_color), legend=None)
+            color=alt.Color('TIME_OF_DAY:N', scale=alt.Scale(range=custom_color), legend=None),
+            tooltip=[alt.Tooltip('TIME_OF_DAY:N', title='Time of Day'), alt.Tooltip('percent:Q', format='.1%', title='Percentage'), alt.Tooltip('count:Q', format=',', title='Count')]
         )
 
-        pie = base.mark_arc(outerRadius=100)
-        return pie
-    
+        slices = base.mark_arc(innerRadius=60, outerRadius=120)
+
+
+        text = base.mark_text(radius=160, size=12).encode(
+            text='full_label:N'
+        )
+
+        pie_chart = (slices + text).properties(
+            width=400,
+            height=300
+        ).configure_view(
+            stroke=None 
+        )
+
+        return pie_chart
 
 app = App(app_ui, server=server)
