@@ -4,6 +4,9 @@ import folium
 from folium.plugins import HeatMap
 import geopandas as gpd
 from pyproj import Transformer
+import plotly.express as px
+from shinywidgets import output_widget, render_widget
+
 
 crime_df = pd.read_csv("data/processed/processed_vancouver_crime_data_2025.csv")
 population_df = pd.read_csv("data/raw/van_pop_2016.csv")
@@ -69,7 +72,9 @@ app_ui = ui.page_sidebar(
             ),
         ui.layout_columns(
             ui.card(
-                ui.card_header(ui.strong("Count of Crime Type")), 
+                # ui.card_header(ui.strong("Count of Crime Type")),
+                ui.card_header(ui.strong("Top Crime Types")),
+                output_widget("top_crime_type_bar"),
                 full_screen=True,
                 ),
             ui.card(
@@ -233,6 +238,88 @@ def server(input, output, session):
         ) * 1000
 
         return merged
+    
+    @reactive.calc
+    def filetered_data_no_crime_type():
+        df = crime_df.copy()
+        nb = input.nb()
+        month = input.month()
+        daily_time = input.daily_time()
+
+        if nb != "All":
+            df = df[df["NEIGHBOURHOOD"] == nb]
+
+        if month != "All":
+            df = df[df["MONTH_NAME"] == month]
+
+        if daily_time != "All":
+            df = df[df["TIME_OF_DAY"] == daily_time]
+        
+        return df
+
+    @reactive.calc
+    def top_crime_types():
+        df = filetered_data_no_crime_type()
+
+        top = (
+            df.groupby("TYPE")
+            .size()
+            .sort_values(ascending=False)
+            .head(5)
+        )
+
+        return top
+
+    @render_widget
+    def top_crime_type_bar():
+        top = top_crime_types()
+
+        if top.empty:
+            fig = px.bar(title="No data for current filters")
+            return fig
+
+        # Convert Series to DataFrame
+        df_top = top.reset_index()
+        df_top.columns = ["Crime Type", "Incidents"]
+
+        # Compute percent share
+        total_incidents = df_top["Incidents"].sum()
+        df_top["Percent Share"] = (df_top["Incidents"] / total_incidents) * 100
+
+        # Reverse for horizontal ordering (largest on top)
+        #df_top = df_top.sort_values("Incidents")
+        df_top = df_top.sort_values("Percent Share")
+
+        fig = px.bar(
+            df_top,
+            # x="Incidents",
+            x="Percent Share",
+            y="Crime Type",
+            orientation="h",
+            # text="Incidents",
+            text=df_top["Percent Share"].map(lambda x: f"{x:.1f}%"),
+            color="Percent Share",
+            color_continuous_scale="Teal", # "YlOrRd",
+            # title="Top 5 Crime Types (% share)",
+            subtitle="(All filters except Crime Type)",
+        )
+
+        fig.update_layout(
+            template="plotly_white",
+            height=400,
+            margin=dict(l=180, r=30, t=50, b=0, pad=0),
+            xaxis_title="Percent of Incidents",
+            yaxis_title="",
+            coloraxis_showscale=False,
+            yaxis=dict(automargin=False),
+
+        )
+
+        fig.update_traces(textposition="outside", 
+                          cliponaxis=False)
+
+        return fig
+
 
     @render.ui
     def crime_map():
