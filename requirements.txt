@@ -1,4 +1,7 @@
 shiny==1.5.1
 geopandas==1.1.2
 pandas==3.0.1
-
+folium==0.20.0
+pyproj==3.7.2
+plotly==6.5.2
+shinywidgets==0.7.1
