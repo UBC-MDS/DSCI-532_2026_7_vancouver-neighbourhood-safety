@@ -1,6 +1,7 @@
 from shiny import App, ui, reactive, render
 from shinywidgets import render_plotly, output_widget
 import pandas as pd
+import altair as alt
 
 crime_df = pd.read_csv("data/processed/processed_vancouver_crime_data_2025.csv")
 population_df = pd.read_csv("data/raw/van_pop_2016.csv")
@@ -133,5 +134,29 @@ def server(input, output, session):
     def neighbourhood_rank():
         rank = neighbourhood_ranking()
         return rank if rank else "N/A"
+    
+    @render_plotly
+    def time_of_day_plot():
+        df = filtered_data()
+        
+        custom_color = ["#fb8500", "#023047", "#669bbc"]
+
+        base = alt.Chart(df).transform_aggregate(
+            count='count()',
+            groupby=['TIME_OF_DAY']
+        ).transform_joinaggregate(
+            total='sum(count)'
+        ).transform_calculate(
+            percent='datum.count / datum.total',
+            full_label='datum.TIME_OF_DAY + ": " + format(datum.percent, ".0%")'
+
+        ).encode(
+            theta=alt.Theta('count:Q', stack=True),
+            color=alt.Color('TIME_OF_DAY:N', scale=alt.Scale(range=custom_color), legend=None)
+        )
+
+        pie = base.mark_arc(outerRadius=100)
+        return pie
+    
 
 app = App(app_ui, server=server)
