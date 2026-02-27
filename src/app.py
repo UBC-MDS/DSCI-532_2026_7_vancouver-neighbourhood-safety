@@ -2,6 +2,7 @@ from shiny import App, ui, reactive, render
 from shinywidgets import render_plotly, output_widget
 import pandas as pd
 import altair as alt
+alt.data_transformers.disable_max_rows()
 
 crime_df = pd.read_csv("data/processed/processed_vancouver_crime_data_2025.csv")
 population_df = pd.read_csv("data/raw/van_pop_2016.csv")
