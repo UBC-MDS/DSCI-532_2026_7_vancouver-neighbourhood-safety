@@ -73,32 +73,32 @@ app_ui = ui.page_fillable(
         ui.value_box("Reported Incidents", 
                     ui.output_text("crime_count"),
                     class_="border border-dark shadow-sm",
-                    showcase=fa.icon_svg("file-invoice", width="24px", height="45px"),
+                    showcase=fa.icon_svg("file-invoice", width="24px", height="35px"),
                     theme="light",
-                    height="130px"),
+                    height="110px"),
         ui.value_box("Crime Rate", 
                     ui.output_text("crime_rate"),
                     class_="border border-dark shadow-sm",
                     showcase=fa.icon_svg("chart-line",  width="24px", height="45px"),
                     theme="light",
-                    height="130px"),
+                    height="110px"),
         ui.value_box("Average Comparison",
                     ui.output_ui("average_comparison"),
                     class_="border border-dark shadow-sm",
                     showcase=fa.icon_svg("scale-balanced",  width="24px", height="45px"),
                     theme="light",
-                    height="130px"),
+                    height="110px"),
         ui.value_box("Neighbourhood Safety Rank", 
                     ui.output_text("neighbourhood_rank"),
                     class_="border border-dark shadow-sm",
                     showcase=fa.icon_svg("shield-halved",  width="24px", height="40px"),
                     theme="light",
-                    height="130px"),
+                    height="110px"),
         fill=False,
     ),
     ui.layout_columns(
         ui.card(
-            ui.card_header(ui.strong("Crime Map by Neigbourhood")),
+            ui.card_header(ui.strong("Overview of Crime Occurrences across Vancouver's Neigbourhood")),
             ui.output_ui("crime_map"),
             #style="height: 100%; width: 100%;",
             full_screen=True
@@ -111,9 +111,10 @@ app_ui = ui.page_fillable(
                 ),
             ui.card(
                 ui.card_header(ui.strong("Crime Occurrences By Time of Day")), 
-                ui.card_body(output_widget("time_of_day_plot", width="100%", height="100%"),
-                fill=True,
-                ),
+                output_widget("time_of_day_plot"),
+                padding=0,
+                #ui.card_body(output_widget("time_of_day_plot"), #, width="100%", height="100%"),
+                #fill=True, full_screen=True),
                 full_screen=True,
                 fill=True
                 ),
@@ -244,19 +245,22 @@ def server(input, output, session):
             tooltip=[alt.Tooltip('TIME_OF_DAY:N', title='Time of Day'), alt.Tooltip('percent:Q', format='.1%', title='Percentage'), alt.Tooltip('count:Q', format=',', title='Count')]
         )
 
-        slices = base.mark_arc(innerRadius=60, outerRadius=120)
+        slices = base.mark_arc(innerRadius=30, outerRadius=60)
 
 
-        text = base.mark_text(radius=160, size=12).encode(
+        text = base.mark_text(radius=90, size=11, align='center', baseline='bottom').encode(
             text='full_label:N'
         )
-
-        pie_chart = (slices + text).properties(
-            width=400,
-            height=300
-        ).configure_view(
+        
+        pie_chart = (text + slices).configure_view(
             stroke=None 
         )
+        # pie_chart = (slices + text).properties(
+        #     width=400,
+        #     height=300
+        # ).configure_view(
+        #     stroke=None 
+        # )
 
         return pie_chart
 
