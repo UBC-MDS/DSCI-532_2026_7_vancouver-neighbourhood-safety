@@ -44,13 +44,13 @@ flowchart TD
     C[/input_crime_month/] --> F2
     D[/input_crime_day/] --> F2
     
-    F --> MAP[MAP]
+    F --> PLOT[PLOT]
     F --> KPIS[KPIs]
     F2 -->CHART[CHART]
 
-    MAP --> P1([plot_map])
+    PLOT --> P1([plot_map])
     CHART --> P2([plot_bar])
-    CHART --> P3([plot_pie])
+    PLOT --> P3([plot_pie])
     KPIS --> K1([kpi_rep_incidents])
     KPIS --> K2([kpi_crime_rate])
     KPIS --> K3([kpi_avg_comparison])
