@@ -13,7 +13,8 @@
 - Implemented choropleth layer displaying crime rate per 1,000 residents by neighbourhood to enable normalized comparison across differently sized areas. (User Story #3) [#61](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/61)
 - Implemented reactive filtering across map layers (neighbourhood, crime type, month, time of day) to ensure consistent cross-component interaction. (User Stories #1, #2, #4) [#61](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/61)
 - Added “Top 5 Crime Types” bar chart displaying percentage share of incidents based on selected filters (excluding crime type) to provide contextual breakdown of crime composition. [#61](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/61)
-- Added 
+- Implemented functionality for KPI metrics for crime count, crime rate, crime rate, average crime rate comparison and neighbourhood safety ranking. [#59](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/59)
+- Implemented reactive calculation functionality to filter the data based on the user's selection in the dashboard. [#53](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/53)
 
 ### Changed
 
