@@ -139,9 +139,24 @@ def server(input, output, session):
         rank = neighbourhood_ranking()
         return rank if rank else "N/A"
     
+    @reactive.calc
+    def data_for_time_of_day_plot():
+        nb = input.nb()
+        crime_type = input.crime_type()
+        month = input.month()
+        df = crime_df.copy()
+        if nb != "All":
+            df = df[df["NEIGHBOURHOOD"] == nb]
+        if crime_type != "All":
+            df = df[df["TYPE"] == crime_type]
+        if month != "All":
+            df = df[df["MONTH_NAME"] == month]
+        return df
+        
+    
     @render_plotly
     def time_of_day_plot():
-        df = filtered_data()
+        df = data_for_time_of_day_plot()
         
         custom_color = ["#fb8500", "#023047", "#669bbc"]
 
