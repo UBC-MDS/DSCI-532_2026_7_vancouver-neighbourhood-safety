@@ -12,7 +12,7 @@
 - Added optional point marker layer for individual crime incidents to allow granular spatial inspection (up to 2000 points). (User Story #1) [#61](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/61)
 - Implemented choropleth layer displaying crime rate per 1,000 residents by neighbourhood to enable normalized comparison across differently sized areas. (User Story #3) [#61](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/61)
 - Implemented reactive filtering across map layers (neighbourhood, crime type, month, time of day) to ensure consistent cross-component interaction. (User Stories #1, #2, #4) [#61](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/61)
-- Added “Top 5 Crime Types” bar chart displaying percentage share of incidents based on selected filters (excluding crime type) to provide contextual breakdown of crime composition. [#61](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/61)
+- Added “Top 5 Crime Types” bar chart displaying percentage share of incidents based on selected filters (excluding crime type) to provide contextual breakdown of crime composition. (User story #5) [#61](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/61)
 
 ### Changed
 
