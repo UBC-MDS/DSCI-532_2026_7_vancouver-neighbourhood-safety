@@ -7,6 +7,7 @@ import folium
 from folium.plugins import HeatMap
 import geopandas as gpd
 from pyproj import Transformer
+import faicons as fa
 
 
 crime_df = pd.read_csv("data/processed/processed_vancouver_crime_data_2025.csv")
@@ -54,43 +55,59 @@ header = ui.div(
 
 app_ui = ui.page_fillable( 
     header,
-        ui.page_sidebar(
-    ui.sidebar(
-        ui.input_select("nb", "Neighbourhood",
-            neighbourhoods),
-        ui.input_select("crime_type", "Crime Type",
-            crime_types),
-        ui.input_select("month", "Month",
-            months),
-        ui.input_select("daily_time", "Time of Day",
-            time_of_day),
-        full_screen=True
-    ),
+    ui.layout_sidebar(
+        ui.sidebar(
+            ui.input_select("nb", "Neighbourhood",
+                neighbourhoods),
+            ui.input_select("crime_type", "Crime Type",
+                crime_types),
+            ui.input_select("month", "Month",
+                months),
+            ui.input_select("daily_time", "Time of Day",
+                time_of_day),
+            full_screen=True,
+            width=250,
+            bg="#f8f9fa",
+        ),
     ui.layout_columns(
-        ui.value_box("Reported Incidents", ui.output_text("crime_count")),
-        ui.value_box("Crime Rate", ui.output_text("crime_rate")),
-        ui.value_box("Average Comparison", ui.output_ui("average_comparison")),
-        ui.value_box("Neighbourhood Safety Rank", ui.output_text("neighbourhood_rank")),
+        ui.value_box("Reported Incidents", 
+                    ui.output_text("crime_count"),
+                    class_="border border-dark shadow-sm",
+                    showcase=fa.icon_svg("file-invoice", width="24px", height="45px"),
+                    theme="light",
+                    height="130px"),
+        ui.value_box("Crime Rate", 
+                    ui.output_text("crime_rate"),
+                    class_="border border-dark shadow-sm",
+                    showcase=fa.icon_svg("chart-line",  width="24px", height="45px"),
+                    theme="light",
+                    height="130px"),
+        ui.value_box("Average Comparison",
+                    ui.output_ui("average_comparison"),
+                    class_="border border-dark shadow-sm",
+                    showcase=fa.icon_svg("scale-balanced",  width="24px", height="45px"),
+                    theme="light",
+                    height="130px"),
+        ui.value_box("Neighbourhood Safety Rank", 
+                    ui.output_text("neighbourhood_rank"),
+                    class_="border border-dark shadow-sm",
+                    showcase=fa.icon_svg("shield-halved",  width="24px", height="40px"),
+                    theme="light",
+                    height="130px"),
         fill=False,
     ),
     ui.layout_columns(
         ui.card(
             ui.card_header(ui.strong("Crime Map by Neigbourhood")),
             ui.output_ui("crime_map"),
-            style="height: 100%; width: 100%;",
+            #style="height: 100%; width: 100%;",
             full_screen=True
             ),
         ui.layout_columns(
             ui.card(
-                # ui.card_header(ui.strong("Count of Crime Type")),
                 ui.card_header(ui.strong("Top Crime Types")),
                 output_widget("top_crime_type_bar"),
                 full_screen=True,
-                # ui.card_body(output_widget("top_crime_type_bar", width="100%", height="100%"),
-                # fill=True
-                # ),
-                #full_screen=True,
-                #fill=True
                 ),
             ui.card(
                 ui.card_header(ui.strong("Crime Occurrences By Time of Day")), 
@@ -103,9 +120,12 @@ app_ui = ui.page_fillable(
             col_widths=[12,12],
             fill=True
         ),
-        col_widths=[7, 5],
-        ),
-        )
+    col_widths=[7, 5],
+    ),
+    fillable=True,
+    style="border-right: 2px solid black;"
+    )
+)
 
 def server(input, output, session):
     @reactive.calc
