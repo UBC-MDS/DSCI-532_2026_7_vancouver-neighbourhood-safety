@@ -41,11 +41,11 @@
         C[/input_crime_month/] --> F
         D[/input_crime_day/] --> F
 
-        A[/input_nbhd/] --> F2[filetered_no_crime_type]
+        A[/input_nbhd/] --> F2[filtered_no_crime_type]
         C[/input_crime_month/] --> F2
         D[/input_crime_day/] --> F2
 
-        A[/input_nbhd/] --> F3[filetered_no_time_of_day]
+        A[/input_nbhd/] --> F3[filtered_no_time_of_day]
         B[/input_crime_type/] --> F3
         C[/input_crime_month/] --> F3
 
