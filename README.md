@@ -4,11 +4,12 @@ The Vancouver Neighbourhood Safety dashboard was developed to provide an interac
 
 ## Visualization
 
-Both the *development* and the *stable* versions of this dashboard can be accessed via the following links:
-
-[Stable version](https://019c9287-0994-4ff7-4350-227e28a7e29e.share.connect.posit.cloud/)
-
+Both the *development* and the *stable* versions of this dashboard can be accessed via the following links:<br>
+[Stable version](https://019c9287-0994-4ff7-4350-227e28a7e29e.share.connect.posit.cloud/)<br>
 [Development version](https://019c928e-e698-6cad-eba8-b45208bebd6f.share.connect.posit.cloud/)
+
+## Demo
+![gif](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/blob/chore/demo-gif/img/vancouver-neighbourhood-safety.gif)
 
 ## Installation
 
