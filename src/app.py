@@ -128,6 +128,17 @@ app_ui = ui.page_navbar(
                     months),
                 ui.input_select("daily_time", "Time of Day",
                     time_of_day),
+                ui.input_checkbox_group(
+                    "map_layers",
+                    "Map Layers",
+                    choices={
+                        "neighbourhoods": "Neighbourhoods",
+                        "heatmap": "Heatmap",
+                        "pointsmap": "Points",
+                        "ratesmap": "Rate / 1,000 residents",
+                    },
+                    selected=["neighbourhoods", "heatmap"]
+                ),
                 full_screen=True,
                 width=250,
                 bg="#f8f9fa",
@@ -161,7 +172,7 @@ app_ui = ui.page_navbar(
         ),
         ui.layout_columns(
             ui.card(
-                ui.card_header(ui.strong("Overview of Crime Occurrences across Vancouver's Neigbourhood")),
+                ui.card_header(ui.strong("Crime Occurrences Across Vancouver's Neigbourhoods")),
                 ui.output_ui("crime_map"),
                 #style="height: 100%; width: 100%;",
                 full_screen=True
@@ -171,6 +182,7 @@ app_ui = ui.page_navbar(
                     ui.card_header(ui.strong("Top Crime Types")),
                     output_widget("top_crime_type_bar"),
                     full_screen=True,
+                    fill=True,
                     ),
                 ui.card(
                     ui.card_header(ui.strong("Crime Occurrences By Time of Day")), 
@@ -487,6 +499,7 @@ def server(input, output, session):
         vancity_center = [49.2827, -123.1207]
         nb = input.nb()
         rates = neighbourhood_rates()
+        layers = input.map_layers()
         
         # Map base
         m = folium.Map(
@@ -497,7 +510,7 @@ def server(input, output, session):
             height="100%",
         )
 
-        # Add neighbourhood polygons (default style)
+        # Add neighbourhood polygons (default-persistent style)
         folium.GeoJson(
             neigh_gdf.__geo_interface__,
             name="Neighbourhoods",
@@ -515,68 +528,70 @@ def server(input, output, session):
                 ).add_to(m)
 
         # Add crime Heatmap and Points layers based on X/Y (lat/lon)
-        # Define toggleable layers
-       
-        # Heatmap layer (default on)
-        heat_layer = folium.FeatureGroup(name="Heatmap", show=True)
-
+        
+        # Map layers persistent state
+        # Show them if selected
         points = filtered_latlon()
-        heat_data = points[["lat", "lon"]].values.tolist()
 
-        if heat_data:
-            HeatMap(
-                heat_data,
-                # name="Crime Heatmap",
-                radius=14,
-                blur=18,
-                max_zoom=13,
-            # ).add_to(m)
-            ).add_to(heat_layer)
-        
-        heat_layer.add_to(m)
-        
-        # Points layer (optional)
-        points_layer = folium.FeatureGroup(name="Points", show=False)
+        # Heatmap layer
+        if "heatmap" in layers:
+            heat_layer = folium.FeatureGroup(name="Heatmap", show=True)
+            heat_data = points[["lat", "lon"]].values.tolist()
 
-        max_points = 2000
-        points_for_markers = points.head(max_points)
-
-        for lat, lon in points_for_markers[["lat", "lon"]].values:
-            folium.CircleMarker(
-                location=[lat, lon],
-                radius=3,
-                weight=1,
-                fill=True,
-                fill_opacity=0.4,
-            ).add_to(points_layer)
+            if heat_data:
+                HeatMap(
+                    heat_data,
+                    # name="Crime Heatmap",
+                    radius=14,
+                    blur=18,
+                    max_zoom=13,
+                # ).add_to(m)
+                ).add_to(heat_layer)
+            
+            heat_layer.add_to(m)
         
-        points_layer.add_to(m)
+        # Points layer
+        if "pointsmap" in layers:
+            points_layer = folium.FeatureGroup(name="Points", show=True)
+            max_points = 2000
+            points_for_markers = points.head(max_points)
+
+            for lat, lon in points_for_markers[["lat", "lon"]].values:
+                folium.CircleMarker(
+                    location=[lat, lon],
+                    radius=3,
+                    weight=1,
+                    fill=True,
+                    fill_opacity=0.4,
+                ).add_to(points_layer)
+            
+            points_layer.add_to(m)
 
         # Choropleth layer for crime rates by neighbourhood
-        
-        # Merge rates into polygons
-        gdf_rate = neigh_gdf.merge(
-            rates,
-            left_on="Name",
-            right_on="NEIGHBOURHOOD",
-            how="left"
-        )
+        if "ratesmap" in layers:
+            # Merge rates into polygons
+            gdf_rate = neigh_gdf.merge(
+                rates,
+                left_on="Name",
+                right_on="NEIGHBOURHOOD",
+                how="left"
+            )
 
-        gdf_rate["incident_count"] = gdf_rate["incident_count"].fillna(0)
-        gdf_rate["rate_per_1000"] = gdf_rate["rate_per_1000"].fillna(0)
+            gdf_rate["incident_count"] = gdf_rate["incident_count"].fillna(0)
+            gdf_rate["rate_per_1000"] = gdf_rate["rate_per_1000"].fillna(0)
 
-        folium.Choropleth(
-            geo_data=gdf_rate.__geo_interface__,
-            data=gdf_rate[["Name", "rate_per_1000"]],
-            columns=["Name", "rate_per_1000"],
-            key_on="feature.properties.Name",
-            name="Rate per 1,000 residents",
-            fill_color="YlOrRd",
-            fill_opacity=0.6,
-            line_opacity=0.3,
-            legend_name="Incidents per 1,000 residents",
-            show=False
-        ).add_to(m)
+            folium.Choropleth(
+                geo_data=gdf_rate.__geo_interface__,
+                data=gdf_rate[["Name", "rate_per_1000"]],
+                columns=["Name", "rate_per_1000"],
+                key_on="feature.properties.Name",
+                name="Rate per 1,000 residents",
+                fill_color="YlOrRd",
+                fill_opacity=0.6,
+                line_opacity=0.3,
+                legend_name="Incidents per 1,000 residents",
+                show=True #False
+            ).add_to(m)
 
         # Zoom map to selected neighbourhood
         bounds = selected_neigh_bounds()
