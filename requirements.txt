@@ -12,3 +12,4 @@ querychat==0.5.1
 chatlas==0.15.2
 python-dotenv==1.2.2
 plotly==6.5.2
+anthropic==0.84.0
