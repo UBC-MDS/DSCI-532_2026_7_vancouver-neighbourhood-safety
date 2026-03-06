@@ -34,3 +34,7 @@ dependencies:
       - shinywidgets==0.7.1
       - folium==0.20.0
       - faicons==0.2.2
+      - python-dotenv==1.0.1
+      - querychat==0.5.2
+      - chatlas==0.4.3
+      - anthropic==0.40.0
