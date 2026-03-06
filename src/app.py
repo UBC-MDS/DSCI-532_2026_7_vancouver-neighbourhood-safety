@@ -143,65 +143,89 @@ app_ui = ui.page_navbar(
                 width=250,
                 bg="#f8f9fa",
             ),
-        ui.layout_columns(
-            ui.value_box("Reported Incidents", 
-                        ui.output_text("crime_count"),
-                        class_="border border-dark shadow-sm",
-                        showcase=fa.icon_svg("file-invoice", width="24px", height="35px"),
-                        theme="light",
-                        height="110px"),
-            ui.value_box("Crime Rate", 
-                        ui.output_text("crime_rate"),
-                        class_="border border-dark shadow-sm",
-                        showcase=fa.icon_svg("chart-line",  width="24px", height="45px"),
-                        theme="light",
-                        height="110px"),
-            ui.value_box("Average Comparison",
-                        ui.output_ui("average_comparison"),
-                        class_="border border-dark shadow-sm",
-                        showcase=fa.icon_svg("scale-balanced",  width="24px", height="45px"),
-                        theme="light",
-                        height="110px"),
-            ui.value_box("Neighbourhood Safety Rank", 
-                        ui.output_text("neighbourhood_rank"),
-                        class_="border border-dark shadow-sm",
-                        showcase=fa.icon_svg("shield-halved",  width="24px", height="40px"),
-                        theme="light",
-                        height="110px"),
-            fill=False,
-        ),
-        ui.layout_columns(
-            ui.card(
-                ui.card_header(ui.strong("Crime Occurrences Across Vancouver's Neigbourhoods")),
-                ui.output_ui("crime_map"),
-                #style="height: 100%; width: 100%;",
-                full_screen=True
-                ),
+        
             ui.layout_columns(
-                ui.card(
-                    ui.card_header(ui.strong("Top Crime Types")),
-                    output_widget("top_crime_type_bar"),
-                    full_screen=True,
-                    fill=True,
-                    ),
-                ui.card(
-                    ui.card_header(ui.strong("Crime Occurrences By Time of Day")), 
-                    output_widget("time_of_day_plot"),
-                    padding=0,
-                    #ui.card_body(output_widget("time_of_day_plot"), #, width="100%", height="100%"),
-                    #fill=True, full_screen=True),
-                    full_screen=True,
-                    fill=True
-                    ),
-                col_widths=[12,12],
-                fill=True
+                ui.value_box("Reported Incidents", 
+                            ui.output_text("crime_count"),
+                            class_="border border-dark shadow-sm",
+                            showcase=fa.icon_svg("file-invoice", width="24px", height="35px"),
+                            theme="light",
+                            height="110px"),
+                ui.value_box("Crime Rate", 
+                            ui.output_text("crime_rate"),
+                            class_="border border-dark shadow-sm",
+                            showcase=fa.icon_svg("chart-line",  width="24px", height="45px"),
+                            theme="light",
+                            height="110px"),
+                ui.value_box("Average Comparison",
+                            ui.output_ui("average_comparison"),
+                            class_="border border-dark shadow-sm",
+                            showcase=fa.icon_svg("scale-balanced",  width="24px", height="45px"),
+                            theme="light",
+                            height="110px"),
+                ui.value_box("Neighbourhood Safety Rank", 
+                            ui.output_text("neighbourhood_rank"),
+                            class_="border border-dark shadow-sm",
+                            showcase=fa.icon_svg("shield-halved",  width="24px", height="40px"),
+                            theme="light",
+                            height="110px"),
+                fill=False,
             ),
-        col_widths=[7, 5],
+            ui.layout_columns(
+                ui.div(
+                    ui.card(
+                        ui.card_header(ui.strong("Map Layers")),
+                        ui.layout_columns(
+                            #ui.input_switch("show_neighbourhoods", "Neighbourhoods", True),
+                            ui.input_switch("show_heatmap", "Heatmap", True),
+                            ui.input_switch("show_points", "Points", False),
+                            ui.input_switch("show_rates", "Rate per 1,000", False),
+                            style="""
+                                display: flex;
+                                gap: 1.5rem;
+                                align-items: center;
+                                padding: 0.25rem 0.5rem;
+                                flex-wrap: wrap;
+                            """
+                        ),
+                        full_screen=False
+                    ),
+                    ui.card(
+                        ui.card_header(ui.strong("Crime Occurrences Across Vancouver's Neigbourhoods")),
+                        ui.output_ui("crime_map"),
+                        #style="height: 100%; width: 100%;",
+                        full_screen=True,
+                        style="height: 700px;"
+                    ),
+                    style="display: flex; flex-direction: column; gap: 0.75rem;"
+                ), #div
+                ui.div(
+                    ui.card(
+                        ui.card_header(ui.strong("Top Crime Types")),
+                        output_widget("top_crime_type_bar"),
+                        full_screen=True,
+                        fill=True,
+                    ),
+                    ui.card(
+                        ui.card_header(ui.strong("Crime Occurrences By Time of Day")), 
+                        output_widget("time_of_day_plot"),
+                        padding=0,
+                        #ui.card_body(output_widget("time_of_day_plot"), #, width="100%", height="100%"),
+                        #fill=True, full_screen=True),
+                        full_screen=True,
+                        fill=True
+                    ),
+                    style="display: flex; flex-direction: column; gap: 0.75rem;"
+                    #col_widths=[12,12],
+                    #fill=True
+                ), #div
+                col_widths=[7, 5]
+            
+            #fillable=True,
+            #style="border-right: 2px solid black;"
+            ),
         ),
-        fillable=True,
-        style="border-right: 2px solid black;"
-        )
-    )
+    ),
 )
 
 def server(input, output, session):
