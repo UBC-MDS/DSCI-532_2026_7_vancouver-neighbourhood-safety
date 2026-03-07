@@ -18,7 +18,7 @@
 - Included the Demo-GIF for the Vancouver Neighbourhood Safety App to provide clarity to users on APP functionality.[#72](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/72)
 - Enabled the map to keep a persistent state of the selected visual layers across changes in the filters. [#97](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/97)
 - Implemented hover-over tooltips to the points in the map Points layer. Displaying further details about the incident. [99](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/99)
-- Added four querychat reactive UI Cards ("Reported Incidents" and "Crime Rate") in the LLM Chat tab.[#100](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/100)
+- Added three querychat reactive UI Cards ("Reported Incidents" and "Crime Rate") in the LLM Chat tab.[#100](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/100)
 
 ### Changed
 - Updated the UI and Visual perception of the Dashboard App to follow design principles [#70](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/70)
