@@ -7,6 +7,10 @@
 - Implemented hover-over tooltips to the points in the map Points layer. Displaying further details about the incident. [99](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/99)
 - Added three querychat reactive UI Cards ("Reported Incidents" and "Crime Rate") in the LLM Chat tab.[#100](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/100)
 - Included default context for filtering, to provide context and opinion directions for prospective users of the vancouver neighborhood safety dashboard. [#104](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/104)
+- Added new tab in the dashboard with QueryChat interface [#77](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/issues/77)
+- Implemented QueryChat interface and default prompts [#88](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/issues/88)
+- Implemented dataframe output to show filtered QueryChat dataframe [#89](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/issues/89)
+- Implemented dataframe download button to download filtered QueryChat dataframe as csv file [#90](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/issues/90)
 
 
 
