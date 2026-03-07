@@ -179,7 +179,7 @@ app_ui = ui.page_navbar(
                 ui.input_selectize("nb", "Neighbourhood",
                     choices=neighbourhoods,
                     multiple=True,
-                    selected="Kitsilano"), 
+                    selected=["Downtown", "West End"]), 
                 ui.input_selectize("crime_type", "Crime Type",
                     choices=crime_types,
                     multiple=True,
