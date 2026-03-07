@@ -115,7 +115,7 @@ app_ui = ui.page_navbar(
             ui.layout_columns(
                 ui.card(
                     ui.div(
-                        "Reported Incidents",
+                        "Incidents Found",
                         style="font-size:0.9rem; color:#666; line-height:1; margin-bottom:0.2rem;"
                     ),
                     ui.div(
@@ -132,6 +132,30 @@ app_ui = ui.page_navbar(
                     ),
                     ui.div(
                         ui.output_text("chat_crime_rate"),
+                        style="font-size:1.4rem; font-weight:600; line-height:1;"
+                    ),
+                    class_="border border-dark shadow-sm",
+                    style="height:100px; padding:0rem 0rem; overflow:hidden;"
+                ),
+                ui.card(
+                    ui.div(
+                        "Most Affected Area",
+                        style="font-size:0.9rem; color:#666; line-height:1; margin-bottom:0.2rem;"
+                    ),
+                    ui.div(
+                        ui.output_text("chat_top_neighbourhood"),
+                        style="font-size:1.4rem; font-weight:600; line-height:1;"
+                    ),
+                    class_="border border-dark shadow-sm",
+                    style="height:100px; padding:0rem 0rem; overflow:hidden;"
+                ),
+                ui.card(
+                    ui.div(
+                        "Most Common Crime",
+                        style="font-size:0.9rem; color:#666; line-height:1; margin-bottom:0.2rem;"
+                    ),
+                    ui.div(
+                        ui.output_text("chat_top_crime"),
                         style="font-size:1.4rem; font-weight:600; line-height:1;"
                     ),
                     class_="border border-dark shadow-sm",
@@ -725,33 +749,48 @@ def server(input, output, session):
 
     @render.text
     def chat_crime_count():
-        return str(len(query_df()))
+        df = query_df()
+        if df.empty:
+            return "N/A"
+        return str(len(df))
 
     @render.text
     def chat_crime_rate():
-        count = len(query_df())
+        df = query_df()
+        count = len(df)
         pop = filtered_population()
         if pop == 0:
             return "No population data"
+        if df.empty:
+            return "N/A"
         rate = (count / pop * 100) if not pd.isna(pop) else 0
         return f"{rate:.2f}%"
     
-    # @render.ui
-    # def chat_average_comparison():
-    #     nb = input.nb()
-    #     city_avg = len(crime_df) / population_df["POPULATION"].sum() * 100
-    #     if nb == "All":
-    #         return ui.span(ui.span(f"{city_avg:.2f}%", style="color: black"))
-        
-    #     neighbourhood_rate = int(len(filtered_data())) / filtered_population() * 100 if filtered_population() > 0 else 0
-    #     comparison_val = neighbourhood_rate - city_avg
-    #     color = "green" if comparison_val < 0 else "red"
-    #     return ui.span(f"{comparison_val:.2f}%", style=f"color: {color}")
+    @render.text
+    def chat_top_neighbourhood():
+        df = query_df()
+        if df.empty:
+            return "N/A"
+        top = (
+            df.groupby("NEIGHBOURHOOD")
+            .size()
+            .sort_values(ascending=False)
+            .index[0]
+        )
+        return str(top)
     
-    # @render.text
-    # def chat_neighbourhood_rank():
-    #     rank = neighbourhood_ranking()
-    #     return rank if rank else "N/A"
+    @render.text
+    def chat_top_crime():
+        df = query_df()
+        if df.empty:
+            return "N/A"
+        top = (
+            df.groupby("TYPE")
+            .size()
+            .sort_values(ascending=False)
+            .index[0]
+        )
+        return str(top)
     
 
 app = App(app_ui, server=server)
