@@ -412,9 +412,10 @@ def server(input, output, session):
     
     @render.ui
     def average_comparison():
-        nb = input.nb()
+        nb_values = resolve_filter(input.nb())
         city_avg = len(crime_df) / population_df["POPULATION"].sum() * 100
-        if nb == "All":
+        
+        if nb_values is None:
             return ui.span(ui.span(f"{city_avg:.2f}%", style="color: black"))
         
         neighbourhood_rate = int(len(filtered_data())) / filtered_population() * 100 if filtered_population() > 0 else 0
