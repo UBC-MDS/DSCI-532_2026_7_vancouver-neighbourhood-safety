@@ -127,19 +127,7 @@ app_ui = ui.page_navbar(
                 ),
                 ui.card(
                     ui.div(
-                        "Crime Rate",
-                        style="font-size:0.9rem; color:#666; line-height:1; margin-bottom:0.2rem;"
-                    ),
-                    ui.div(
-                        ui.output_text("chat_crime_rate"),
-                        style="font-size:1.4rem; font-weight:600; line-height:1;"
-                    ),
-                    class_="border border-dark shadow-sm",
-                    style="height:100px; padding:0rem 0rem; overflow:hidden;"
-                ),
-                ui.card(
-                    ui.div(
-                        "Most Affected Area",
+                        "Most Affected Neighbourhood",
                         style="font-size:0.9rem; color:#666; line-height:1; margin-bottom:0.2rem;"
                     ),
                     ui.div(
@@ -753,18 +741,6 @@ def server(input, output, session):
         if df.empty:
             return "N/A"
         return str(len(df))
-
-    @render.text
-    def chat_crime_rate():
-        df = query_df()
-        count = len(df)
-        pop = filtered_population()
-        if pop == 0:
-            return "No population data"
-        if df.empty:
-            return "N/A"
-        rate = (count / pop * 100) if not pd.isna(pop) else 0
-        return f"{rate:.2f}%"
     
     @render.text
     def chat_top_neighbourhood():
