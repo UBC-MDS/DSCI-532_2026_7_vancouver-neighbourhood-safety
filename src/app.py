@@ -97,7 +97,7 @@ The dataset can be used to analyze:
     client=ChatAnthropic(model="claude-sonnet-4-0"),
 )
 
-app_ui = ui.page_navbar( 
+app_ui = ui.page_navbar(
     ui.nav_panel(
         "LLM Chat",
         ui.layout_sidebar(
@@ -112,7 +112,47 @@ app_ui = ui.page_navbar(
                 ui.output_data_frame("data_table"),
                 fill=True,
             ),
+            ui.layout_columns(
+                ui.card(
+                    ui.div(
+                        "Incidents Found",
+                        style="font-size:0.9rem; color:#666; line-height:1; margin-bottom:0.2rem;"
+                    ),
+                    ui.div(
+                        ui.output_text("chat_crime_count"),
+                        style="font-size:1.4rem; font-weight:600; line-height:1;"
+                    ),
+                    class_="border border-dark shadow-sm",
+                    style="height:100px; padding:0rem 0rem; overflow:hidden;"
+                ),
+                ui.card(
+                    ui.div(
+                        "Most Affected Neighbourhood",
+                        style="font-size:0.9rem; color:#666; line-height:1; margin-bottom:0.2rem;"
+                    ),
+                    ui.div(
+                        ui.output_text("chat_top_neighbourhood"),
+                        style="font-size:1.4rem; font-weight:600; line-height:1;"
+                    ),
+                    class_="border border-dark shadow-sm",
+                    style="height:100px; padding:0rem 0rem; overflow:hidden;"
+                ),
+                ui.card(
+                    ui.div(
+                        "Most Common Crime",
+                        style="font-size:0.9rem; color:#666; line-height:1; margin-bottom:0.2rem;"
+                    ),
+                    ui.div(
+                        ui.output_text("chat_top_crime"),
+                        style="font-size:1.4rem; font-weight:600; line-height:1;"
+                    ),
+                    class_="border border-dark shadow-sm",
+                    style="height:100px; padding:0rem 0rem; overflow:hidden;"
+                ),
+                fillable=False,
+            ),
             fillable=True,
+
         ),
     ),
     ui.nav_panel(
@@ -221,7 +261,7 @@ app_ui = ui.page_navbar(
                 col_widths=[7, 5]
             ),
         ),
-    ),
+    )
 )
 
 def server(input, output, session):
@@ -694,5 +734,39 @@ def server(input, output, session):
     def download_filtered():
         df = query_df()
         yield df.to_csv(index=False)
+
+    @render.text
+    def chat_crime_count():
+        df = query_df()
+        if df.empty:
+            return "N/A"
+        return str(len(df))
+    
+    @render.text
+    def chat_top_neighbourhood():
+        df = query_df()
+        if df.empty:
+            return "N/A"
+        top = (
+            df.groupby("NEIGHBOURHOOD")
+            .size()
+            .sort_values(ascending=False)
+            .index[0]
+        )
+        return str(top)
+    
+    @render.text
+    def chat_top_crime():
+        df = query_df()
+        if df.empty:
+            return "N/A"
+        top = (
+            df.groupby("TYPE")
+            .size()
+            .sort_values(ascending=False)
+            .index[0]
+        )
+        return str(top)
+    
 
 app = App(app_ui, server=server)
