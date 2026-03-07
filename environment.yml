@@ -19,7 +19,7 @@ dependencies:
   - rtree
 
   # Visualization
-  - plotly=6.5
+  - plotly=6.5.2
   - altair=6.0.0
   - vega_datasets=0.9.0
   - ipywidgets=8.1
@@ -34,7 +34,7 @@ dependencies:
       - shinywidgets==0.7.1
       - folium==0.20.0
       - faicons==0.2.2
-      - python-dotenv==1.0.1
-      - querychat==0.5.2
-      - chatlas==0.4.3
-      - anthropic==0.40.0
+      - python-dotenv==1.2.2
+      - querychat==0.5.1
+      - chatlas==0.15.2
+      - anthropic==0.84.0
