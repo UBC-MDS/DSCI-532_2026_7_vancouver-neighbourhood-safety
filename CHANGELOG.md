@@ -20,7 +20,7 @@
 ### Changed
 - Updated the UI and Visual perception of the Dashboard App to follow design principles [#70](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/70)
 
-- Adjusted the title bar to include a more comprehensive summary of the primary purpose of the dashboard. 
+- Adjusted the title bar to include a more comprehensive summary of the primary purpose of the dashboard. [#98](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/98)
 
 
 ### Known Issues
