@@ -213,33 +213,39 @@ app_ui = ui.page_navbar(
                 width=250,
                 bg="#f8f9fa",
             ),
-        
+            ####################################################################################################
+            ###### KINDLY NOTE THAT: The styling for the value boxes Code block below  was customized with Gemini #####
+            ####################################################################################################
             ui.layout_columns(
-                ui.value_box("Reported Incidents", 
-                            ui.output_text("crime_count"),
-                            class_="border border-dark shadow-sm",
-                            showcase=fa.icon_svg("file-invoice", width="24px", height="35px"),
-                            theme="light",
-                            height="110px"),
-                ui.value_box("Crime Rate", 
-                            ui.output_text("crime_rate"),
-                            class_="border border-dark shadow-sm",
-                            showcase=fa.icon_svg("chart-line",  width="24px", height="45px"),
-                            theme="light",
-                            height="110px"),
-                ui.value_box("Average Comparison",
-                            ui.output_ui("average_comparison"),
-                            class_="border border-dark shadow-sm",
-                            showcase=fa.icon_svg("scale-balanced",  width="24px", height="45px"),
-                            theme="light",
-                            height="110px"),
-                ui.value_box("Neighbourhood Safety Rank", 
-                            ui.output_text("neighbourhood_rank"),
-                            class_="border border-dark shadow-sm",
-                            showcase=fa.icon_svg("shield-halved",  width="24px", height="40px"),
-                            theme="light",
-                            height="110px"),
-                fill=False,
+            ui.div(
+                ui.div(fa.icon_svg("file-invoice", width="16px", height="16px"), " Reported Incidents", style="font-size: 14px; color: #444; margin-bottom: 4px;"),
+                ui.div(ui.output_text("crime_count"), style="font-size: 26px; font-weight: bold; line-height: 1;"),
+                class_="card border border-dark shadow-sm",
+                style="padding: 15px; height: 90px; display: flex; flex-direction: column; justify-content: center;"
+            ),
+            
+            ui.div(
+                ui.div(fa.icon_svg("chart-line", width="16px", height="16px"), " Crime Rate", style="font-size: 14px; color: #444; margin-bottom: 4px;"),
+                ui.div(ui.output_text("crime_rate"), style="font-size: 26px; font-weight: bold; line-height: 1;"),
+                class_="card border border-dark shadow-sm",
+                style="padding: 15px; height: 90px; display: flex; flex-direction: column; justify-content: center;"
+            ),
+            
+            ui.div(
+                ui.div(fa.icon_svg("scale-balanced", width="16px", height="16px"), " Average Comparison", style="font-size: 14px; color: #444; margin-bottom: 4px;"),
+                ui.div(ui.output_ui("average_comparison"), style="font-size: 26px; font-weight: bold; line-height: 1;"),
+                class_="card border border-dark shadow-sm",
+                style="padding: 15px; height: 90px; display: flex; flex-direction: column; justify-content: center;"
+            ),
+            
+            ui.div(
+                ui.div(fa.icon_svg("shield-halved", width="16px", height="16px"), " Neighbourhood Safety Rank", style="font-size: 14px; color: #444; margin-bottom: 4px;"),
+                ui.div(ui.output_text("neighbourhood_rank"), style="font-size: 26px; font-weight: bold; line-height: 1;"),
+                class_="card border border-dark shadow-sm",
+                style="padding: 15px; height: 90px; display: flex; flex-direction: column; justify-content: center;"
+            ),
+            fill=False,
+            
             ),
             ui.layout_columns(
                 ui.div(
@@ -300,6 +306,8 @@ def server(input, output, session):
         "Helper function to convert 'All' selections to None for easier filtering logic"
         if not values or "All" in values:
             return None
+        if isinstance(values, str):
+            return [values]
         return values
     
     def get_filtered_data(filter_nb=True, filter_crime=True, filter_month=True, filter_time=True):

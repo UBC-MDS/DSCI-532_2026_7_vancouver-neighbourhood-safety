@@ -18,6 +18,7 @@
 - Adjusted the layout of the Map and the two graphics to use a "div" section. [#97](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/97)
 - Adjusted the title bar to include a more comprehensive summary of the primary purpose of the dashboard. [#98](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/98)
 - Optimized all code blocks associated with filtering data, Modified the filter pane to include a multi-select option alongside a clear all filters button. [101](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/101)
+- Customized the Dashboard icons and KPIS to fit the a one-screen frame. [107](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/107)
 
 
 ### Known Issues
