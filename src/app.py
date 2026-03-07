@@ -667,10 +667,26 @@ def server(input, output, session):
         # Highlight selected neighbourhood
         if nb_values is not None:
             sel_neigh = neigh_gdf[neigh_gdf["Name"].isin(nb_values)]
+            
+            
+            # if not sel_neigh.empty:
+            #     folium.GeoJson(
+            #         sel_neigh.__geo_interface__,
+            #         name=f"Selected: {nb}",
+            #         style_function=neigh_style_selected,
+            #     ).add_to(m)
+            
             if not sel_neigh.empty:
+                if len(nb_values) == 1:
+                    layer_name = f"Selected: {nb_values[0]}"
+                elif len(nb_values) <= 3:
+                    layer_name = f"Selected: {', '.join(nb_values)}"
+                else:
+                    layer_name = f"Selected Neighbourhoods ({len(nb_values)})"
+                    
                 folium.GeoJson(
                     sel_neigh.__geo_interface__,
-                    name=f"Selected: {nb}",
+                    name=layer_name,
                     style_function=neigh_style_selected,
                 ).add_to(m)
 
