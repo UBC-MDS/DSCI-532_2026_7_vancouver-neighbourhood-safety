@@ -51,13 +51,29 @@ def neigh_style_selected(_feature):
         "fillOpacity": 0.18, 
         "weight": 3
     }
-    
+
+
 header = ui.div(
-    ui.div(
-        ui.h1("🍁 Vancouver Neighbourhood Safety", class_="mb-0 fs-3"),
+    ui.h2(
+        "🍁 Vancouver Neighbourhood Safety",
+        style="margin-bottom:4px; font-weight:600;"
     ),
-    class_="text-white p-4 mb-0 d-flex justify-content-between align-items-center",
-    style="background-color: #023047;"
+    ui.p(
+        "Compare crime patterns across Vancouver neighbourhoods",
+        style="margin-bottom:2px;"
+    ),
+    ui.p(
+        "Explore where incidents cluster, which crime types are most common, and when they happen.",
+        style="margin-bottom:0; color:rgba(255,255,255,0.85);"
+    ),
+    style="""
+        background-color:#023047;
+        color:white;
+        padding:16px 20px;
+        border-radius:8px;
+        margin-bottom:14px;
+        border-bottom:4px solid #fb8500;
+    """
 )
 
 qc = querychat.QueryChat(
