@@ -178,16 +178,26 @@ app_ui = ui.page_navbar(
             ui.sidebar(
                 ui.input_selectize("nb", "Neighbourhood",
                     choices=neighbourhoods,
-                    multiple=True),
+                    multiple=True,
+                    selected="Kitsilano"), 
                 ui.input_selectize("crime_type", "Crime Type",
                     choices=crime_types,
-                    multiple=True),
+                    multiple=True,
+                    selected="Break and Enter Residential/Other"),
                 ui.input_selectize("month", "Month",
                     choices=months, 
-                    multiple=True),
+                    multiple=True,
+                    selected="June"),
                 ui.input_selectize("daily_time", "Time of Day",
                     choices=time_of_day,
-                    multiple=True),
+                    multiple=True,
+                    selected="All"),
+                ui.input_action_button("clear_filters", "Clear All Filters", 
+                    class_="btn btn-secondary btn-sm w-100 mt-2",
+                    style="""
+                    background-color:#023047;
+                    color:white;
+                    """),
                 # ui.input_checkbox_group(
                 #     "map_layers",
                 #     "Map Layers",
@@ -319,6 +329,13 @@ def server(input, output, session):
                 
         return df
     
+    @reactive.effect
+    @reactive.event(input.clear_filters)
+    def clear_all_filters():
+        ui.update_selectize("nb", selected=[])
+        ui.update_selectize("crime_type", selected=[])
+        ui.update_selectize("month", selected=[])
+        ui.update_selectize("daily_time", selected=[])
     
     @reactive.calc
     def filtered_data():
@@ -465,7 +482,7 @@ def server(input, output, session):
             tooltip=[alt.Tooltip('TIME_OF_DAY:N', title='Time of Day'), alt.Tooltip('percent:Q', format='.1%', title='Percentage'), alt.Tooltip('count:Q', format=',', title='Count')]
         )
 
-        slices = base.mark_arc(innerRadius=40, outerRadius=70)
+        slices = base.mark_arc(innerRadius=30, outerRadius=60)
 
 
         text = base.mark_text(radius=100, size=11, align='center', baseline='bottom').encode(
