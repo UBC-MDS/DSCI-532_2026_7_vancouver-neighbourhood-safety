@@ -268,11 +268,11 @@ app_ui = ui.page_navbar(
                         """
                     ),
                     ui.card(
-                        ui.card_header(ui.strong("Crime Occurrences Across Vancouver's Neigbourhoods")),
+                        ui.card_header(ui.strong("Crime Occurrences Across Neigbourhoods")),
                         ui.output_ui("crime_map"),
                         #style="height: 100%; width: 100%;",
                         full_screen=True,
-                        style="height: 700px;"
+                        style="height: 600px;"
                     ),
                     style="display: flex; flex-direction: column; gap: 0.75rem;"
                 ), #div
@@ -281,7 +281,11 @@ app_ui = ui.page_navbar(
                         ui.card_header(ui.strong("Top Crime Types")),
                         output_widget("top_crime_type_bar"),
                         full_screen=True,
-                        fill=True,
+                        #fill=True,
+                        style="""
+                            height: 320px;
+                            flex-grow: 1 1 0;
+                        """
                     ),
                     ui.card(
                         ui.card_header(ui.strong("Crime Occurrences By Time of Day")), 
@@ -290,11 +294,21 @@ app_ui = ui.page_navbar(
                         #ui.card_body(output_widget("time_of_day_plot"), #, width="100%", height="100%"),
                         #fill=True, full_screen=True),
                         full_screen=True,
-                        fill=True
+                        #fill=True
+                        style="""
+                            height: 320px;
+                            flex-grow: 1 1 0;
+                        """
                     ),
-                    style="display: flex; flex-direction: column; gap: 0.75rem;"
+                    style="""
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.2rem;
+                        height: 100%;
+                    """
                 ), #div
-                col_widths=[7, 5]
+                col_widths=[7, 5],
+                fill=True
             ),
         ),
     )
@@ -499,6 +513,10 @@ def server(input, output, session):
         
         pie_chart = (text + slices).configure_view(
             stroke=None 
+        ).properties(
+            height="container",
+            # width=320,
+            width="container",
         )
         # pie_chart = (slices + text).properties(
         #     width=400,
@@ -633,14 +651,15 @@ def server(input, output, session):
         
         chart = (
             alt.Chart(df_top)
-            .mark_bar()
+            .mark_bar(size=25)
             .encode(
                 x=alt.X("Percent Share:Q", title="Percent of Incidents"),
                 y=alt.Y(
                     "Crime Type:N",
                     sort=alt.SortField("Percent Share", order="descending"),
                     title="",
-                    axis=alt.Axis(labelLimit=100)   # Restrict long labels
+                    axis=alt.Axis(labelLimit=100),   # Restrict long labels
+                    scale=alt.Scale(paddingInner=0)
                 ),
                 color=alt.Color(
                     "Percent Share:Q",
@@ -654,7 +673,9 @@ def server(input, output, session):
                 ],
             )
             .properties(
-                # height=320,
+                height="container",
+                #width=320,
+                width="container",
                 title=alt.TitleParams(
                     text="(All filters except Crime Type)",
                     # subtitle="(All filters except Crime Type)",
