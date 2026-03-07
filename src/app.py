@@ -362,31 +362,33 @@ def server(input, output, session):
 
     @reactive.calc
     def filtered_latlon():
-        df = filtered_data()
+        df = filtered_data().copy()
 
         # Validate numeric values and drop missing coordinates
-        xy = df[["X", "Y"]].copy()
-        xy["X"] = pd.to_numeric(xy["X"], errors="coerce")
-        xy["Y"] = pd.to_numeric(xy["Y"], errors="coerce")
-        xy = xy.dropna()
+        #xy = df[["X", "Y"]].copy()
+        df["X"] = pd.to_numeric(df["X"], errors="coerce")
+        df["Y"] = pd.to_numeric(df["Y"], errors="coerce")
+        df = df.dropna(subset=["X", "Y"])
 
-        if xy.empty:
+        if df.empty:
             return pd.DataFrame(columns=["lat", "lon"])
         
         # Source UTM Zone 10N WGS84 EPSG:32610 to WGS84 lat/lon EPSG:4326
         transformer = Transformer.from_crs("EPSG:32610", "EPSG:4326", always_xy=True)
 
-        lons, lats = transformer.transform(xy["X"].to_numpy(), xy["Y"].to_numpy())
-        out = pd.DataFrame({"lat": lats,
-                            "lon": lons})
+        lons, lats = transformer.transform(df["X"].to_numpy(), df["Y"].to_numpy())
+        df["lat"] = lats
+        df["lon"] = lons
+        # out = pd.DataFrame({"lat": lats,
+        #                     "lon": lons})
         
         # Metro Vancouver bounds
-        out = out[
-            out["lat"].between(49.0, 49.4) &
-            out["lon"].between(-123.3, -122.9)
-        ]
+        # df = df[
+        #     df["lat"].between(49.0, 49.4) &
+        #     df["lon"].between(-123.3, -122.9)
+        # ]
 
-        return out
+        return df
     
     @reactive.calc
     def selected_neigh_bounds():
@@ -578,13 +580,23 @@ def server(input, output, session):
             max_points = 2000
             points_for_markers = points.head(max_points)
 
-            for lat, lon in points_for_markers[["lat", "lon"]].values:
+            #for lat, lon in points_for_markers[["lat", "lon"]].values:
+            for _, row in points_for_markers.iterrows():
+                # Tooltip content
+                tooltip_text = (
+                    f"<b>{row['TYPE']}</b><br>"
+                    f"{row['HUNDRED_BLOCK']}<br>"
+                    f"{row['NEIGHBOURHOOD']}<br>"
+                    f"{row['MONTH_NAME']} {row['DAY']} at {row['HOUR']:02}:{row['MINUTE']:02}"
+                )
+                
                 folium.CircleMarker(
-                    location=[lat, lon],
+                    location=[row["lat"], row["lon"]],
                     radius=3,
                     weight=1,
                     fill=True,
                     fill_opacity=0.4,
+                    tooltip=tooltip_text
                 ).add_to(points_layer)
             
             points_layer.add_to(m)
