@@ -17,6 +17,7 @@
 - Implemented reactive calculation functionality to filter the data based on the user's selection in the dashboard. [#53](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/53)
 - Included the Demo-GIF for the Vancouver Neighbourhood Safety App to provide clarity to users on APP functionality.[#72](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/72)
 - Enabled the map to keep a persistent state of the selected visual layers across changes in the filters. [#97](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/97)
+- Implemented hover-over tooltips to the points in the map Points layer. Displaying further details about the incident. [99](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/99)
 
 
 ### Changed
