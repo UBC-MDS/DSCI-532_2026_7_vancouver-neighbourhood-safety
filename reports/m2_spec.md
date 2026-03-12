@@ -76,3 +76,14 @@
 | `selected_neigh_bounds`      | `filtered_data()`, `neigh_gdf`  | Extracts selected neighbourhood polygon and computes bounding box coordinate to zoom in the map. | `crime_map`  |
 | `filetered_data_no_crime_type`      | `filtered_data()`, `neigh_gdf`  | Applies neighbourhood, month, and time-of-day filters while intentionally excluding the crime type filter. | `top_crime_types`  |
 | `top_crime_types`      | `filetered_data_no_crime_type()` | Groups incidents by crime type, counts occurrences, sorts descending, and selects the top five categories. | `top_crime_type_bar`  |
+
+# Testing Plan
+
+| Test function            | Test type | Description |
+|--------------------------|----------|-------------|
+| test_sidebar_filters     | UI test  | Verifies that filters update correctly when selections are changed |
+| test_clear_filters_button| UI test  | Checks that clicking the "Clear All Filters" button resets the sidebar filter inputs to an empty selection state after filters have been applied |
+| test_map_layer_switches  | UI test  | Ensures that map layer toggle switches (heatmap, points, and rate layers) correctly change their checked state when interacted with |
+| test_download_button     | UI test  | Verifies that the download button is visible in the LLM Chat tab and displays the correct label text |
+| test_filter_neighbourhood| Unit test| Tests the filtering logic function to ensure that filtering by a specific neighbourhood returns only rows belonging to that neighbourhood |
+| test_filter_multiple_conditions | Unit test | Validates that the filtering logic correctly applies multiple simultaneous filter conditions (e.g., neighbourhood, crime type, and month) and returns the expected subset of data |
