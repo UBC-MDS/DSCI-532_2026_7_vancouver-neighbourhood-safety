@@ -28,6 +28,10 @@ dependencies:
   # Notebook (optional but currently included)
   - jupyterlab=4.5
 
+  # Testing
+  - pytest=9.0.2
+  - pytest-playwright=0.7.2
+
   - pip
   - pip:
       - shiny==1.5.1
