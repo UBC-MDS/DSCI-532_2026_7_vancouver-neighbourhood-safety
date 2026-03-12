@@ -15,8 +15,10 @@ def go_chat(page):
     page.get_by_role("tab", name="LLM Chat").click()
     page.wait_for_timeout(400)
 
-# Test filters functionality
 def test_sidebar_filters(page: Page, app: ShinyAppProc):
+    """
+    This test verifies that filters update correctly when selections are changed
+    """
     page.goto(app.url)
 
     go_main(page)
@@ -37,8 +39,10 @@ def test_sidebar_filters(page: Page, app: ShinyAppProc):
     time.set(["Morning"])
     time.expect_selected(["Morning"])
 
-# Test clear filters button functionality
 def test_clear_filters_button(page: Page, app: ShinyAppProc):
+    """
+    This test checks that clicking the "Clear All Filters" button resets the sidebar filter inputs to an empty selection state after filters have been applied
+    """
     page.goto(app.url)
 
     go_main(page)
@@ -58,8 +62,10 @@ def test_clear_filters_button(page: Page, app: ShinyAppProc):
     nb.expect_selected([])
     crime.expect_selected([])
 
-
 def test_map_layer_switches(page: Page, app: ShinyAppProc):
+    """
+    This test verifies that map layer toggle switches (heatmap, points, and rate layers) correctly change their checked state when interacted with
+    """
     page.goto(app.url)
 
     go_main(page)
@@ -79,16 +85,10 @@ def test_map_layer_switches(page: Page, app: ShinyAppProc):
     rates.set(True)
     rates.expect_checked(True)
 
-
-def test_llm_chat_navigation(page: Page, app: ShinyAppProc):
-    page.goto(app.url)
-
-    go_chat(page)
-
-    go_main(page)
-
-
 def test_download_button(page: Page, app: ShinyAppProc):
+    """
+    This test verifies that the "Download data" button in the LLM Chat tab correctly displays the text "Download data" and is clickable
+    """
     page.goto(app.url)
 
     go_chat(page)
