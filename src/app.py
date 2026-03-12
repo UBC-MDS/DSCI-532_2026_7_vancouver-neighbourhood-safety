@@ -328,7 +328,7 @@ def server(input, output, session):
     def neighbourhood_ranking():
         nb_values = resolve_filter(input.nb())
         
-        if nb_values is None:
+        if nb_values is None or len(nb_values) > 1:
             return None
             
         df = get_filtered_data(crime_df, resolve_filter(input.crime_type()), resolve_filter(input.month()), resolve_filter(input.daily_time()))
