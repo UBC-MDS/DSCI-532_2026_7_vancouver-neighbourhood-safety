@@ -170,6 +170,7 @@ app_ui = ui.page_navbar(
             fillable=True,
 
         ),
+        value = "llm_chat",
     ),
     ui.nav_panel(
         "Main dashboard",
@@ -198,17 +199,6 @@ app_ui = ui.page_navbar(
                     background-color:#023047;
                     color:white;
                     """),
-                # ui.input_checkbox_group(
-                #     "map_layers",
-                #     "Map Layers",
-                #     choices={
-                #         #"neighbourhoods": "Neighbourhoods",
-                #         "heatmap": "Heatmap",
-                #         "pointsmap": "Points",
-                #         "ratesmap": "Rate / 1,000 residents",
-                #     },
-                #     selected=["heatmap"]
-                # ),
                 full_screen=True,
                 width=250,
                 bg="#f8f9fa",
@@ -270,18 +260,16 @@ app_ui = ui.page_navbar(
                     ui.card(
                         ui.card_header(ui.strong("Crime Occurrences Across Neigbourhoods")),
                         ui.output_ui("crime_map"),
-                        #style="height: 100%; width: 100%;",
                         full_screen=True,
                         style="height: 600px;"
                     ),
                     style="display: flex; flex-direction: column; gap: 0.75rem;"
-                ), #div
+                ), 
                 ui.div(
                     ui.card(
                         ui.card_header(ui.strong("Top Crime Types")),
                         output_widget("top_crime_type_bar"),
                         full_screen=True,
-                        #fill=True,
                         style="""
                             height: 320px;
                             flex-grow: 1 1 0;
@@ -291,10 +279,7 @@ app_ui = ui.page_navbar(
                         ui.card_header(ui.strong("Crime Occurrences By Time of Day")), 
                         output_widget("time_of_day_plot"),
                         padding=0,
-                        #ui.card_body(output_widget("time_of_day_plot"), #, width="100%", height="100%"),
-                        #fill=True, full_screen=True),
                         full_screen=True,
-                        #fill=True
                         style="""
                             height: 320px;
                             flex-grow: 1 1 0;
@@ -306,11 +291,12 @@ app_ui = ui.page_navbar(
                         gap: 0.2rem;
                         height: 100%;
                     """
-                ), #div
+                ), 
                 col_widths=[7, 5],
                 fill=True
             ),
         ),
+        value = "main_dashboard",
     )
 )
 
@@ -362,20 +348,6 @@ def server(input, output, session):
     @reactive.calc
     def filtered_data():
         return get_filtered_data()
-        # nb = input.nb()
-        # crime_type = input.crime_type()
-        # month = input.month()
-        # daily_time = input.daily_time()
-        # df = crime_df.copy()
-        # if nb != "All":
-        #     df = df[df["NEIGHBOURHOOD"] == nb]
-        # if crime_type != "All":
-        #     df = df[df["TYPE"] == crime_type]
-        # if month != "All":
-        #     df = df[df["MONTH_NAME"] == month]
-        # if daily_time != "All":
-        #     df = df[df["TIME_OF_DAY"] == daily_time]
-        # return df
     
     @reactive.calc
     def filtered_population():
@@ -385,36 +357,6 @@ def server(input, output, session):
         else:
             pop = population_df[population_df["NEIGHBOURHOOD"].isin(nb_values)]["POPULATION"]
             return pop.sum() if not pop.empty else 0
-        # nb = input.nb()
-        # if nb == "All":
-        #     return population_df["POPULATION"].sum()
-        # else:
-        #     pop = population_df[population_df["NEIGHBOURHOOD"] == nb]["POPULATION"]
-        #     return pop.iloc[0] if not pop.empty else 0
-        
-    # @reactive.calc
-    # def neighbourhood_ranking():
-    #     nb = input.nb()
-    #     crime_type = input.crime_type()
-    #     month = input.month()
-    #     daily_time = input.daily_time()
-    #     if nb == "All":
-    #         return None
-    #     df = crime_df.copy()
-    #     if crime_type != "All":
-    #         df = df[df["TYPE"] == crime_type]
-    #     if month != "All":
-    #         df = df[df["MONTH_NAME"] == month]
-    #     if daily_time != "All":
-    #         df = df[df["TIME_OF_DAY"] == daily_time]
-    #     crime_counts = df.groupby("NEIGHBOURHOOD").size()
-    #     rates = crime_counts / population_df.set_index("NEIGHBOURHOOD")["POPULATION"] * 100
-    #     ranked = rates.sort_values(ascending=True).reset_index()
-    #     if nb in ranked["NEIGHBOURHOOD"].values:
-    #         rank = ranked[ranked["NEIGHBOURHOOD"] == nb].index[0] + 1
-    #         total = len(ranked)
-    #         return f"{rank} / {total}"
-    #     return None
     
     @reactive.calc
     def neighbourhood_ranking():
@@ -470,16 +412,6 @@ def server(input, output, session):
     @reactive.calc
     def data_for_time_of_day_plot():
         df = get_filtered_data(filter_time=False)
-        # nb = input.nb()
-        # crime_type = input.crime_type()
-        # month = input.month()
-        # df = crime_df.copy()
-        # if nb != "All":
-        #     df = df[df["NEIGHBOURHOOD"] == nb]
-        # if crime_type != "All":
-        #     df = df[df["TYPE"] == crime_type]
-        # if month != "All":
-        #     df = df[df["MONTH_NAME"] == month]
         return df
         
         
@@ -515,25 +447,14 @@ def server(input, output, session):
             stroke=None 
         ).properties(
             height="container",
-            # width=320,
             width="container",
         )
-        # pie_chart = (slices + text).properties(
-        #     width=400,
-        #     height=300
-        # ).configure_view(
-        #     stroke=None 
-        # )
 
         return pie_chart
 
     @reactive.calc
     def filtered_latlon():
         df = filtered_data().copy()
-        #df = get_filtered_data()
-
-        # Validate numeric values and drop missing coordinates
-        #xy = df[["X", "Y"]].copy()
         df["X"] = pd.to_numeric(df["X"], errors="coerce")
         df["Y"] = pd.to_numeric(df["Y"], errors="coerce")
         df = df.dropna(subset=["X", "Y"])
@@ -547,14 +468,6 @@ def server(input, output, session):
         lons, lats = transformer.transform(df["X"].to_numpy(), df["Y"].to_numpy())
         df["lat"] = lats
         df["lon"] = lons
-        # out = pd.DataFrame({"lat": lats,
-        #                     "lon": lons})
-        
-        # Metro Vancouver bounds
-        # df = df[
-        #     df["lat"].between(49.0, 49.4) &
-        #     df["lon"].between(-123.3, -122.9)
-        # ]
 
         return df
     
@@ -602,19 +515,6 @@ def server(input, output, session):
     @reactive.calc
     def filetered_data_no_crime_type():
         df = get_filtered_data(filter_crime=False)
-        # df = crime_df.copy()
-        # nb = input.nb()
-        # month = input.month()
-        # daily_time = input.daily_time()
-
-        # if nb != "All":
-        #     df = df[df["NEIGHBOURHOOD"] == nb]
-
-        # if month != "All":
-        #     df = df[df["MONTH_NAME"] == month]
-
-        # if daily_time != "All":
-        #     df = df[df["TIME_OF_DAY"] == daily_time]
         return df
 
     @reactive.calc
@@ -645,9 +545,6 @@ def server(input, output, session):
         # Compute percent share
         total_incidents = df_top["Incidents"].sum()
         df_top["Percent Share"] = (df_top["Incidents"] / total_incidents) * 100
-
-        # Reverse for horizontal ordering (largest on top)
-        #df_top = df_top.sort_values("Incidents")
         
         chart = (
             alt.Chart(df_top)
@@ -674,11 +571,9 @@ def server(input, output, session):
             )
             .properties(
                 height="container",
-                #width=320,
                 width="container",
                 title=alt.TitleParams(
                     text="(All filters except Crime Type)",
-                    # subtitle="(All filters except Crime Type)",
                 ),
             )
             .configure_title(fontSize=12)
@@ -692,7 +587,6 @@ def server(input, output, session):
         vancity_center = [49.2827, -123.1207]
         nb_values = resolve_filter(input.nb())
         rates = neighbourhood_rates()
-        #layers = input.map_layers()
         
         # Map base
         m = folium.Map(
@@ -713,14 +607,6 @@ def server(input, output, session):
         # Highlight selected neighbourhood
         if nb_values is not None:
             sel_neigh = neigh_gdf[neigh_gdf["Name"].isin(nb_values)]
-            
-            
-            # if not sel_neigh.empty:
-            #     folium.GeoJson(
-            #         sel_neigh.__geo_interface__,
-            #         name=f"Selected: {nb}",
-            #         style_function=neigh_style_selected,
-            #     ).add_to(m)
             
             if not sel_neigh.empty:
                 if len(nb_values) == 1:
@@ -743,7 +629,6 @@ def server(input, output, session):
         points = filtered_latlon()
 
         # Heatmap layer
-        #if "heatmap" in layers:
         if input.show_heatmap():
             heat_layer = folium.FeatureGroup(name="Heatmap", show=True)
             heat_data = points[["lat", "lon"]].values.tolist()
@@ -751,17 +636,14 @@ def server(input, output, session):
             if heat_data:
                 HeatMap(
                     heat_data,
-                    # name="Crime Heatmap",
                     radius=14,
                     blur=18,
                     max_zoom=13,
-                # ).add_to(m)
                 ).add_to(heat_layer)
             
             heat_layer.add_to(m)
 
         # Choropleth layer for crime rates by neighbourhood
-        #if "ratesmap" in layers:
         if input.show_rates():
             # Merge rates into polygons
             gdf_rate = neigh_gdf.merge(
@@ -788,13 +670,11 @@ def server(input, output, session):
             ).add_to(m)
 
         # Points layer
-        #if "pointsmap" in layers:
         if input.show_points():
             points_layer = folium.FeatureGroup(name="Points", show=True)
             max_points = 2000
             points_for_markers = points.head(max_points)
 
-            #for lat, lon in points_for_markers[["lat", "lon"]].values:
             for _, row in points_for_markers.iterrows():
                 # Tooltip content
                 tooltip_text = (
