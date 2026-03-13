@@ -12,7 +12,7 @@ import querychat
 from chatlas import ChatGithub, ChatAnthropic
 from dotenv import load_dotenv
 import os
-from utils import resolve_filter, get_filtered_data
+from .utils import resolve_filter, get_filtered_data
 
 load_dotenv()
 

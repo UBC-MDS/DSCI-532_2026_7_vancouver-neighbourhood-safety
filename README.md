@@ -58,8 +58,10 @@ conda activate vc_safety2
 
 To render the app, navigate to the root of the project directory and run:
 
+Note: The traditional "shyny run ..." command may fail due to the required adjustems for importing app modules. Please use the following command.
+
 ``` bash
-shiny run src/app.py
+shiny run --reload src.app
 ```
 
 Open http://127.0.0.1:8000 in a web browser
