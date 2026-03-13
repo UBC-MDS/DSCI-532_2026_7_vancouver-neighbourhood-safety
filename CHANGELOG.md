@@ -1,3 +1,31 @@
+## [0.4.0]
+
+### Added
+
+### Changed
+
+### Fixed
+
+### Known Issues
+
+### Release Highlight
+
+### Collaboration
+
+### Reflection
+
+# Testing Plan
+
+# Testing Plan
+
+| Test function | Test type | Description | What could break |
+|--------------|----------|-------------|------------------|
+| test_sidebar_filters | UI test | Verifies that filters update correctly when selections are changed | Renaming input IDs, changing filter UI components or defaults, or altering dashboard navigation |
+| test_clear_filters_button | UI test | Checks that clicking the "Clear All Filters" button resets sidebar filters to an empty state | Changing button ID, modifying reset logic, or altering reactive update behaviour |
+| test_map_layer_switches | UI test | Ensures that map layer toggle switches change state correctly when interacted with | Renaming switch inputs, changing default states, or redesigning map layer controls |
+| test_download_button | UI test | Verifies that the download button is visible in the LLM Chat tab with the correct label | Changing button ID or label, moving/removing the button, or restructuring the chat layout |
+| test_filter_neighbourhood | Unit test | Ensures filtering by neighbourhood returns only matching rows | Changing filtering logic, dataframe column names, or how empty filters are handled |
+| test_filter_multiple_conditions | Unit test | Ensures multiple filters are applied simultaneously to return the correct subset | Changing filter interaction logic (e.g., union vs intersection) or altering category values |
 
 
 ## [0.3.0]

@@ -12,6 +12,7 @@ import querychat
 from chatlas import ChatGithub, ChatAnthropic
 from dotenv import load_dotenv
 import os
+from utils import resolve_filter, get_filtered_data
 
 load_dotenv()
 
@@ -302,41 +303,6 @@ app_ui = ui.page_navbar(
 
 def server(input, output, session):
     
-    def resolve_filter(values):
-        "Helper function to convert 'All' selections to None for easier filtering logic"
-        if not values or "All" in values:
-            return None
-        if isinstance(values, str):
-            return [values]
-        return values
-    
-    def get_filtered_data(filter_nb=True, filter_crime=True, filter_month=True, filter_time=True):
-        """Helper function to apply selected filters to the vancouver neighbourhood data 
-        based on which filters are enabled"""
-        df = crime_df.copy()
-        
-        if filter_nb:
-            nb_val = resolve_filter(input.nb())
-            if nb_val is not None:         
-                df = df[df["NEIGHBOURHOOD"].isin(nb_val)]
-                
-        if filter_crime:
-            crime_val = resolve_filter(input.crime_type())
-            if crime_val is not None: 
-                df = df[df["TYPE"].isin(crime_val)]
-                
-        if filter_month:
-            month_val = resolve_filter(input.month())
-            if month_val is not None:      
-                df = df[df["MONTH_NAME"].isin(month_val)]
-                
-        if filter_time:
-            time_val = resolve_filter(input.daily_time())
-            if time_val is not None: 
-                df = df[df["TIME_OF_DAY"].isin(time_val)]
-                
-        return df
-    
     @reactive.effect
     @reactive.event(input.clear_filters)
     def clear_all_filters():
@@ -347,7 +313,7 @@ def server(input, output, session):
     
     @reactive.calc
     def filtered_data():
-        return get_filtered_data()
+        return get_filtered_data(crime_df, resolve_filter(input.nb()), resolve_filter(input.crime_type()), resolve_filter(input.month()), resolve_filter(input.daily_time()))
     
     @reactive.calc
     def filtered_population():
@@ -365,7 +331,7 @@ def server(input, output, session):
         if nb_values is None:
             return None
             
-        df = get_filtered_data(filter_nb=False)
+        df = get_filtered_data(crime_df, resolve_filter(input.crime_type()), resolve_filter(input.month()), resolve_filter(input.daily_time()))
         nb = nb_values[0]
         
         crime_counts = df.groupby("NEIGHBOURHOOD").size()
@@ -411,7 +377,7 @@ def server(input, output, session):
     
     @reactive.calc
     def data_for_time_of_day_plot():
-        df = get_filtered_data(filter_time=False)
+        df = get_filtered_data(crime_df, resolve_filter(input.nb()), resolve_filter(input.crime_type()), resolve_filter(input.month()))
         return df
         
         
@@ -514,7 +480,7 @@ def server(input, output, session):
     
     @reactive.calc
     def filetered_data_no_crime_type():
-        df = get_filtered_data(filter_crime=False)
+        df = get_filtered_data(crime_df, resolve_filter(input.nb()), resolve_filter(input.month()), resolve_filter(input.daily_time()))
         return df
 
     @reactive.calc

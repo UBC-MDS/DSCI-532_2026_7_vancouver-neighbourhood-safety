@@ -64,6 +64,21 @@ shiny run src/app.py
 
 Open http://127.0.0.1:8000 in a web browser
 
+## To run the tests
+
+You can run the tests for this package using `pytest`. First, install the environment if you have not already done previously:
+
+``` bash
+conda env create -f environment.yml
+conda activate vc_safety2
+```
+
+Then, run the tests with:
+
+```         
+pytest --browser firefox
+```
+
 ## Data Attribution
 This project uses dataset provided by the City of Vancouver and the Vancouver Police Department.
 
