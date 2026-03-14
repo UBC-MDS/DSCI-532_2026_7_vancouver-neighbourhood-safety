@@ -9,7 +9,7 @@ Both the *development* and the *stable* versions of this dashboard can be access
 [Development version](https://019c928e-e698-6cad-eba8-b45208bebd6f.share.connect.posit.cloud/)
 
 ## Demo
-![gif](./img/vancouver-neighbourhood-safety.gif)
+![gif](./img/demo.gif)
 
 ## User Guide
 
