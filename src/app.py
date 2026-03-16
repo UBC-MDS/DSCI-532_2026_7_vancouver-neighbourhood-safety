@@ -12,7 +12,7 @@ import querychat
 from chatlas import ChatGithub, ChatAnthropic
 from dotenv import load_dotenv
 import os
-from utils import resolve_filter, get_filtered_data
+from .utils import resolve_filter, get_filtered_data
 
 load_dotenv()
 
@@ -313,7 +313,13 @@ def server(input, output, session):
     
     @reactive.calc
     def filtered_data():
-        return get_filtered_data(crime_df, resolve_filter(input.nb()), resolve_filter(input.crime_type()), resolve_filter(input.month()), resolve_filter(input.daily_time()))
+        return get_filtered_data(
+            crime_df, 
+            filter_nb=resolve_filter(input.nb()), 
+            filter_crime=resolve_filter(input.crime_type()), 
+            filter_month=resolve_filter(input.month()), 
+            filter_time=resolve_filter(input.daily_time())
+            )
     
     @reactive.calc
     def filtered_population():
@@ -331,7 +337,12 @@ def server(input, output, session):
         if nb_values is None or len(nb_values) > 1:
             return None
             
-        df = get_filtered_data(crime_df, resolve_filter(input.crime_type()), resolve_filter(input.month()), resolve_filter(input.daily_time()))
+        df = get_filtered_data(
+            crime_df, 
+            filter_crime=resolve_filter(input.crime_type()), 
+            filter_month=resolve_filter(input.month()), 
+            filter_time=resolve_filter(input.daily_time())
+            )
         nb = nb_values[0]
         
         crime_counts = df.groupby("NEIGHBOURHOOD").size()
@@ -360,15 +371,36 @@ def server(input, output, session):
     @render.ui
     def average_comparison():
         nb_values = resolve_filter(input.nb())
-        city_avg = len(crime_df) / population_df["POPULATION"].sum() * 100
+        city_crime_filtered = get_filtered_data(
+            crime_df, 
+            filter_crime=resolve_filter(input.crime_type()), 
+            filter_month=resolve_filter(input.month()), 
+            filter_time=resolve_filter(input.daily_time())
+            )
+        city_avg = len(city_crime_filtered) / population_df["POPULATION"].sum() * 100
         
         if nb_values is None:
             return ui.span(ui.span(f"{city_avg:.2f}%", style="color: black"))
         
         neighbourhood_rate = int(len(filtered_data())) / filtered_population() * 100 if filtered_population() > 0 else 0
-        comparison_val = neighbourhood_rate - city_avg
-        color = "green" if comparison_val < 0 else "red"
-        return ui.span(f"{comparison_val:.2f}%", style=f"color: {color}")
+        comparison_val = round(neighbourhood_rate, 2) - round(city_avg, 2)
+        if comparison_val > 0:
+            color = "red"
+            direction = "up"
+        elif comparison_val < 0:
+            color = "green"
+            direction = "down"
+        else:
+            color = None
+            direction = None
+
+        icon_html = f'<i class="fa fa-caret-{direction}"></i> ' if direction else ""
+        style_str = f"color: {color};" if color else ""
+
+        return ui.span(
+            ui.HTML(f"{icon_html}{abs(comparison_val):.2f}%"),
+            style=style_str
+        )
     
     @render.text
     def neighbourhood_rank():
@@ -377,7 +409,12 @@ def server(input, output, session):
     
     @reactive.calc
     def data_for_time_of_day_plot():
-        df = get_filtered_data(crime_df, resolve_filter(input.nb()), resolve_filter(input.crime_type()), resolve_filter(input.month()))
+        df = get_filtered_data(
+            crime_df, 
+            filter_nb=resolve_filter(input.nb()), 
+            filter_crime=resolve_filter(input.crime_type()), 
+            filter_month=resolve_filter(input.month())
+            )
         return df
         
         
@@ -480,7 +517,12 @@ def server(input, output, session):
     
     @reactive.calc
     def filetered_data_no_crime_type():
-        df = get_filtered_data(crime_df, resolve_filter(input.nb()), resolve_filter(input.month()), resolve_filter(input.daily_time()))
+        df = get_filtered_data(
+            crime_df, 
+            filter_nb=resolve_filter(input.nb()), 
+            filter_month=resolve_filter(input.month()), 
+            filter_time=resolve_filter(input.daily_time())
+            )
         return df
 
     @reactive.calc
