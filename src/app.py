@@ -387,7 +387,11 @@ def server(input, output, session):
     
     @reactive.calc
     def filtered_data():
-        return get_filtered_data(input.nb(), input.crime_type(), input.month(), input.daily_time())
+        return get_filtered_data(
+            filter_nb=input.nb(), 
+            filter_crime=input.crime_type(), 
+            filter_month=input.month(), 
+            filter_time=input.daily_time())
     
     @reactive.calc
     def filtered_population():
@@ -405,7 +409,10 @@ def server(input, output, session):
         if nb_values is None or len(nb_values) > 1:
             return None
             
-        df = get_filtered_data(input.crime_type(), input.month(), input.daily_time())
+        df = get_filtered_data(
+            filter_crime=input.crime_type(), 
+            filter_month=input.month(), 
+            filter_time=input.daily_time())
         nb = nb_values[0]
         
         crime_counts = df.groupby("NEIGHBOURHOOD").size()
@@ -434,7 +441,12 @@ def server(input, output, session):
     @render.ui
     def average_comparison():
         nb_values = resolve_filter(input.nb())
-        city_avg = len(get_filtered_data()) / population_df["POPULATION"].sum() * 100
+        city_crime_filtered = get_filtered_data(
+            filter_crime=input.crime_type(), 
+            filter_month=input.month(), 
+            filter_time=input.daily_time()
+            )
+        city_avg = len(city_crime_filtered) / population_df["POPULATION"].sum() * 100
         
         if nb_values is None:
             return ui.span(ui.span(f"{city_avg:.2f}%", style="color: black"))
@@ -466,7 +478,10 @@ def server(input, output, session):
     
     @reactive.calc
     def data_for_time_of_day_plot():
-        df = get_filtered_data(input.nb(), input.crime_type(), input.month())
+        df = get_filtered_data(
+            filter_nb=input.nb(), 
+            filter_crime=input.crime_type(), 
+            filter_month=input.month())
         return df
         
         
