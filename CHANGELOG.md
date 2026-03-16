@@ -1,6 +1,7 @@
 ## [0.4.0]
 
 ### Added
+- Integrated MongoDB Atlas to log each querychat interaction, capturing the user query, LLM response, SQL generated, row count, and timestamp. Logs are displayed as a live table in the LLM Chat page and are downloadable as CSV. Logging failures are handled gracefully and will not break the UI. [#148](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/148)
 
 ### Changed
 
