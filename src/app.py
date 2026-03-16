@@ -312,6 +312,12 @@ app_ui = ui.page_navbar(
                 ),
                 fillable=False,
             ),
+            ui.card(
+            ui.card_header("Query Log (MongoDB Atlas)"),
+            ui.download_button("download_log", "Download CSV"),
+            ui.output_data_frame("log_table"),
+        ),
+            
             fillable=True,
 
         ),
