@@ -12,16 +12,16 @@ import querychat
 from chatlas import ChatGithub, ChatAnthropic
 from dotenv import load_dotenv
 import os
-from .utils import resolve_filter, get_filtered_data
+from .utils import resolve_filter, get_filtered_data, get_neighbourhoods, get_crime_types
 
 load_dotenv()
 
 api_key = os.getenv("ANTHROPIC_API_KEY")
 
-crime_df = pd.read_csv("data/processed/processed_vancouver_crime_data_2025.csv")
+# Load support population data
 population_df = pd.read_csv("data/raw/van_pop_2016.csv")
 
-# Load neighbourhood polygons
+# Load support neighbourhood polygons data
 neigh_gdf = gpd.read_file("data/processed/merged_vancity.gpkg",
                         layer="merged_vancity")
 
@@ -30,8 +30,8 @@ neigh_gdf = neigh_gdf.to_crs(epsg=4326)
 
 
 # Input options for the dropdowns
-neighbourhoods = ["All"] + sorted(crime_df["NEIGHBOURHOOD"].unique())
-crime_types = ["All"] + sorted(crime_df["TYPE"].unique())
+neighbourhoods = ["All"] + get_neighbourhoods()
+crime_types = ["All"] + get_crime_types()
 months = ["All", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 time_of_day = ["All", "Morning", "Afternoon", "Evening/Night"]
 
@@ -78,7 +78,7 @@ header = ui.div(
 )
 
 qc = querychat.QueryChat(
-    crime_df.copy(),
+    get_filtered_data(),   # Retrieve all data, using DuckDB
     "VancouverNeighbourhoodSafety",
     greeting="""👋 Hi there! I am your friendly Vancouver neighbourhood crime bot. Ask me anything about the crimes in Vancouver.
 
@@ -388,12 +388,10 @@ def server(input, output, session):
     @reactive.calc
     def filtered_data():
         return get_filtered_data(
-            crime_df, 
-            filter_nb=resolve_filter(input.nb()), 
-            filter_crime=resolve_filter(input.crime_type()), 
-            filter_month=resolve_filter(input.month()), 
-            filter_time=resolve_filter(input.daily_time())
-            )
+            filter_nb=input.nb(), 
+            filter_crime=input.crime_type(), 
+            filter_month=input.month(), 
+            filter_time=input.daily_time())
     
     @reactive.calc
     def filtered_population():
@@ -412,11 +410,9 @@ def server(input, output, session):
             return None
             
         df = get_filtered_data(
-            crime_df, 
-            filter_crime=resolve_filter(input.crime_type()), 
-            filter_month=resolve_filter(input.month()), 
-            filter_time=resolve_filter(input.daily_time())
-            )
+            filter_crime=input.crime_type(), 
+            filter_month=input.month(), 
+            filter_time=input.daily_time())
         nb = nb_values[0]
         
         crime_counts = df.groupby("NEIGHBOURHOOD").size()
@@ -446,10 +442,9 @@ def server(input, output, session):
     def average_comparison():
         nb_values = resolve_filter(input.nb())
         city_crime_filtered = get_filtered_data(
-            crime_df, 
-            filter_crime=resolve_filter(input.crime_type()), 
-            filter_month=resolve_filter(input.month()), 
-            filter_time=resolve_filter(input.daily_time())
+            filter_crime=input.crime_type(), 
+            filter_month=input.month(), 
+            filter_time=input.daily_time()
             )
         city_avg = len(city_crime_filtered) / population_df["POPULATION"].sum() * 100
         
@@ -484,11 +479,9 @@ def server(input, output, session):
     @reactive.calc
     def data_for_time_of_day_plot():
         df = get_filtered_data(
-            crime_df, 
-            filter_nb=resolve_filter(input.nb()), 
-            filter_crime=resolve_filter(input.crime_type()), 
-            filter_month=resolve_filter(input.month())
-            )
+            filter_nb=input.nb(), 
+            filter_crime=input.crime_type(), 
+            filter_month=input.month())
         return df
         
         
@@ -592,11 +585,10 @@ def server(input, output, session):
     @reactive.calc
     def filetered_data_no_crime_type():
         df = get_filtered_data(
-            crime_df, 
-            filter_nb=resolve_filter(input.nb()), 
-            filter_month=resolve_filter(input.month()), 
-            filter_time=resolve_filter(input.daily_time())
-            )
+            filter_nb=input.nb(), 
+            filter_month=input.month(), 
+            filter_time=input.daily_time()
+        )
         return df
 
     @reactive.calc
