@@ -11,13 +11,31 @@ import faicons as fa
 import querychat
 from chatlas import ChatGithub, ChatAnthropic
 from dotenv import load_dotenv
+from pymongo import MongoClient
+from datetime import datetime
 import os
-from .utils import resolve_filter, get_filtered_data
+from utils import resolve_filter, get_filtered_data
 
 load_dotenv()
 
 api_key = os.getenv("ANTHROPIC_API_KEY")
 
+
+# ── Persistent storage: MongoDB Atlas ────────────────────────────────────────
+_client = MongoClient(os.getenv("MONGODB_URI"))
+collection = _client["van_safety_logs"]["query_log"]  # change db name if needed
+
+SCHEMA = ["timestamp", "tool", "user_query", "sql", "n_rows"]
+
+def save_info(row: dict) -> None:
+    collection.insert_one(row)
+
+def load_data(section: str) -> pd.DataFrame:
+    rows = list(collection.find({}, {"_id": 0}))
+    return pd.DataFrame(rows, columns=SCHEMA) if rows else pd.DataFrame(columns=SCHEMA)
+
+
+# ── Data Ingestion ────────────────────────────────────────
 crime_df = pd.read_csv("data/processed/processed_vancouver_crime_data_2025.csv")
 population_df = pd.read_csv("data/raw/van_pop_2016.csv")
 
