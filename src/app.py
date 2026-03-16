@@ -261,6 +261,17 @@ app_ui = ui.page_navbar(
     ),
     ui.nav_panel(
         "LLM Chat",
+        # ui.tags.style("""
+        #     shiny-chat-container.querychat shiny-chat-messages {
+        #         max-height: 85vh;
+        #         overflow-y: auto;
+        #     }
+        #     shiny-chat-container.querychat {
+        #         height: auto !important;
+        #         flex: 0 1 auto !important;
+        #     }
+
+        # """),
         ui.layout_sidebar(
             qc.sidebar(),
             ui.card(
@@ -316,6 +327,7 @@ app_ui = ui.page_navbar(
             ui.card_header("Query Log (MongoDB Atlas)"),
             ui.download_button("download_log", "Download CSV"),
             ui.output_data_frame("log_table"),
+            max_height="300px",
         ),
             
             fillable=True,
