@@ -244,6 +244,12 @@ app_ui = ui.page_navbar(
             fill=False,
             
             ),
+            ui.tags.style("""
+            .tooltip-left .tooltip-inner {
+                text-align: left;
+                max-width: 260px;
+            }
+            """),
             ui.layout_columns(
                 ui.div(
                     ui.div(
@@ -251,6 +257,22 @@ app_ui = ui.page_navbar(
                         ui.input_switch("show_heatmap", "Heatmap", True),
                         ui.input_switch("show_points", "Points", False),
                         ui.input_switch("show_rates", "Rate per 1,000", False),
+                        ui.span(
+                            fa.icon_svg("circle-info", width="12px", height="12px"),
+                            **{
+                                "data-bs-toggle": "tooltip",
+                                "data-bs-placement": "top",
+                                "data-bs-html": "true",
+                                "data-bs-custom-class": "tooltip-left",
+                                "title": """
+                                    Available map layers: <br>
+                                     - Heatmap: intensity based on number of incidents. <br>
+                                     - Points: reported incidents with additional information in tooltips (up to 2,000 points). <br>
+                                     - Rate per 1,000: neighbourhood heatmap normalized by population. <br>
+                                """
+                            },
+                            style="margin-left:6px; color:#888; cursor:pointer;"
+                        ),
                         style="""
                             display:flex;
                             gap:1rem;
@@ -262,10 +284,25 @@ app_ui = ui.page_navbar(
                             #white-space:nowrap;
                             #vertical-align:middle;
                             position:relative; top:10px;
-                        """
+                        """                        
                     ),
                     ui.card(
-                        ui.card_header(ui.strong("Crime Occurrences Across Neigbourhoods")),
+                        ui.card_header(
+                            ui.strong("Crime Occurrences Across Neigbourhoods"),
+                            ui.span(
+                                fa.icon_svg("circle-info", width="12px", height="12px"),
+                                **{
+                                    "data-bs-toggle": "tooltip",
+                                    "data-bs-placement": "top",
+                                    "data-bs-html": "true",
+                                    # "data-bs-custom-class": "tooltip-left",
+                                    "title": """
+                                        Map of Vancouver's neighbourhoods showing the selected layers.
+                                    """
+                                },
+                                style="margin-left:6px; color:#888; cursor:pointer;"
+                            ),
+                        ),
                         ui.output_ui("crime_map"),
                         full_screen=True,
                         style="height: 600px;"
@@ -274,7 +311,9 @@ app_ui = ui.page_navbar(
                 ), 
                 ui.div(
                     ui.card(
-                        ui.card_header(ui.strong("Top Crime Types")),
+                        ui.card_header(
+                            ui.strong("Top Crime Types")
+                        ),
                         output_widget("top_crime_type_bar"),
                         full_screen=True,
                         style="""
