@@ -25,13 +25,13 @@ api_key = os.getenv("ANTHROPIC_API_KEY")
 _client = MongoClient(os.getenv("MONGODB_URI"))
 collection = _client["van_safety_logs"]["query_log"]  # change db name if needed
 
-SCHEMA = ["timestamp", "tool", "user_query", "sql", "n_rows"]
+SCHEMA = ["session_id", "timestamp", "tool", "user_query", "sql", "n_rows"]
 
 def save_info(row: dict) -> None:
     collection.insert_one(row)
 
-def load_data(section: str) -> pd.DataFrame:
-    rows = list(collection.find({}, {"_id": 0}))
+def load_data(session_id: str) -> pd.DataFrame:
+    rows = list(collection.find({"session_id": session_id}, {"_id": 0}))
     return pd.DataFrame(rows, columns=SCHEMA) if rows else pd.DataFrame(columns=SCHEMA)
 
 
@@ -734,7 +734,54 @@ def server(input, output, session):
         return ui.HTML(m._repr_html_())
     
     qc_vals = qc.server()
+    session_id = session.id
 
+    log = reactive.value(load_data(session.id))
+    pending = reactive.value(None)   
+
+    def on_query(req):
+        """Fires inside Extended Task — only .set() is allowed here, no reactive reads."""
+        if req.name not in ("querychat_update_dashboard", "querychat_query"):
+            return
+        sql = req.arguments.get("query", "")
+        if not sql:
+            return
+        turns = qc_vals.client.get_turns()
+        user_turns = [t for t in turns if t.role == "user"]
+        pending.set({
+            "user_query" : user_turns[-1].text if user_turns else "(unknown)",
+            "sql": sql,
+            "tool": req.name,
+        })
+
+    qc_vals.client.on_tool_request(on_query)
+
+    @reactive.effect
+    def flush_log():
+        entry = pending()
+        if not entry:
+            return
+        entry["session_id"] = session_id
+        entry["n_rows"] = len(qc_vals.df())    
+        entry["timestamp"] = datetime.now().isoformat(timespec="seconds")
+        save_info(entry)
+        log.set(pd.concat([log(), pd.DataFrame([entry])], ignore_index=True))
+        pending.set(None)                      
+
+    # @reactive.effect
+    # def reload_log_on_section():
+    #     """Reload log from MongoDB when section selector changes."""
+    #     log.set(load_data(input.section()))
+
+    @render.data_frame
+    def log_table():
+        return render.DataGrid(log(), width="100%")
+
+    @render.download(filename=lambda: f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_query_log.csv")
+    def download_log():
+        yield log().to_csv(index=False)
+
+    #______________________Previous Reactive Calculations_______________________
     @reactive.calc
     def query_df():
         return qc_vals.df()
