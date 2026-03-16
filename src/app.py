@@ -12,16 +12,16 @@ import querychat
 from chatlas import ChatGithub, ChatAnthropic
 from dotenv import load_dotenv
 import os
-from .utils import resolve_filter, get_filtered_data
+from .utils import resolve_filter, get_filtered_data, get_neighbourhoods, get_crime_types
 
 load_dotenv()
 
 api_key = os.getenv("ANTHROPIC_API_KEY")
 
-crime_df = pd.read_csv("data/processed/processed_vancouver_crime_data_2025.csv")
+# Load support population data
 population_df = pd.read_csv("data/raw/van_pop_2016.csv")
 
-# Load neighbourhood polygons
+# Load support neighbourhood polygons data
 neigh_gdf = gpd.read_file("data/processed/merged_vancity.gpkg",
                         layer="merged_vancity")
 
@@ -30,8 +30,8 @@ neigh_gdf = neigh_gdf.to_crs(epsg=4326)
 
 
 # Input options for the dropdowns
-neighbourhoods = ["All"] + sorted(crime_df["NEIGHBOURHOOD"].unique())
-crime_types = ["All"] + sorted(crime_df["TYPE"].unique())
+neighbourhoods = ["All"] + get_neighbourhoods()
+crime_types = ["All"] + get_crime_types()
 months = ["All", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 time_of_day = ["All", "Morning", "Afternoon", "Evening/Night"]
 
@@ -78,7 +78,7 @@ header = ui.div(
 )
 
 qc = querychat.QueryChat(
-    crime_df.copy(),
+    get_filtered_data(),   # Retrieve all data, using DuckDB
     "VancouverNeighbourhoodSafety",
     greeting="""👋 Hi there! I am your friendly Vancouver neighbourhood crime bot. Ask me anything about the crimes in Vancouver.
 
@@ -360,7 +360,7 @@ def server(input, output, session):
     @render.ui
     def average_comparison():
         nb_values = resolve_filter(input.nb())
-        city_avg = len(crime_df) / population_df["POPULATION"].sum() * 100
+        city_avg = len(get_filtered_data()) / population_df["POPULATION"].sum() * 100
         
         if nb_values is None:
             return ui.span(ui.span(f"{city_avg:.2f}%", style="color: black"))
