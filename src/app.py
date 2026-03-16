@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 from pymongo import MongoClient
 from datetime import datetime
 import os
-from .utils import resolve_filter, get_filtered_data
+from .utils import resolve_filter, get_filtered_data, get_neighbourhoods, get_crime_types
 
 load_dotenv()
 
@@ -43,7 +43,7 @@ def load_data() -> pd.DataFrame:
 # Load support population data
 population_df = pd.read_csv("data/raw/van_pop_2016.csv")
 
-# Load neighbourhood polygons
+# Load support neighbourhood polygons data
 neigh_gdf = gpd.read_file("data/processed/merged_vancity.gpkg",
                         layer="merged_vancity")
 
@@ -52,8 +52,8 @@ neigh_gdf = neigh_gdf.to_crs(epsg=4326)
 
 
 # Input options for the dropdowns
-neighbourhoods = ["All"] + sorted(crime_df["NEIGHBOURHOOD"].unique())
-crime_types = ["All"] + sorted(crime_df["TYPE"].unique())
+neighbourhoods = ["All"] + get_neighbourhoods()
+crime_types = ["All"] + get_crime_types()
 months = ["All", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 time_of_day = ["All", "Morning", "Afternoon", "Evening/Night"]
 
@@ -82,11 +82,7 @@ header = ui.div(
         style="margin-bottom:4px; font-weight:600;"
     ),
     ui.p(
-        "Compare crime patterns across Vancouver neighbourhoods",
-        style="margin-bottom:2px;"
-    ),
-    ui.p(
-        "Explore where incidents cluster, which crime types are most common, and when they happen.",
+        "Explore where incidents clustered across Vancouver in 2025, which crime types were most common, and when they occurred.",
         style="margin-bottom:0; color:rgba(255,255,255,0.85);"
     ),
     style="""
@@ -100,7 +96,7 @@ header = ui.div(
 )
 
 qc = querychat.QueryChat(
-    crime_df.copy(),
+    get_filtered_data(),   # Retrieve all data, using DuckDB
     "VancouverNeighbourhoodSafety",
     greeting="""👋 Hi there! I am your friendly Vancouver neighbourhood crime bot. Ask me anything about the crimes in Vancouver.
 
@@ -173,35 +169,105 @@ app_ui = ui.page_navbar(
             ####################################################################################################
             ui.layout_columns(
             ui.div(
-                ui.div(fa.icon_svg("file-invoice", width="16px", height="16px"), " Reported Incidents", style="font-size: 14px; color: #444; margin-bottom: 4px;"),
-                ui.div(ui.output_text("crime_count"), style="font-size: 26px; font-weight: bold; line-height: 1;"),
+                ui.div(
+                    fa.icon_svg("scale-balanced", width="16px", height="16px"),
+                    " Reported Incidents ",
+                    ui.span(
+                        fa.icon_svg("circle-info", width="12px", height="12px"),
+                        **{
+                            "data-bs-toggle": "tooltip",
+                            "data-bs-placement": "top",
+                            "title": "Shows total number of reported incidents in the selected neighbourhood(s) based on the filters applied."
+                        },
+                        style="margin-left:6px; color:#888; cursor:pointer;"
+                    ),
+                    style="font-size: 14px; color: #444; margin-bottom: 4px;"
+                ),
+                ui.div(
+                    ui.output_ui("crime_count"),
+                    style="font-size: 26px; font-weight: bold; line-height: 1;"
+                ),
                 class_="card border border-dark shadow-sm",
                 style="padding: 15px; height: 90px; display: flex; flex-direction: column; justify-content: center;"
             ),
             
             ui.div(
-                ui.div(fa.icon_svg("chart-line", width="16px", height="16px"), " Crime Rate", style="font-size: 14px; color: #444; margin-bottom: 4px;"),
-                ui.div(ui.output_text("crime_rate"), style="font-size: 26px; font-weight: bold; line-height: 1;"),
+                ui.div(
+                    fa.icon_svg("scale-balanced", width="16px", height="16px"),
+                    " Crime Rate ",
+                    ui.span(
+                        fa.icon_svg("circle-info", width="12px", height="12px"),
+                        **{
+                            "data-bs-toggle": "tooltip",
+                            "data-bs-placement": "top",
+                            "title": "Shows crime rate of the selected neighbourhood(s). Calculated as Total crimes in neighbourhood(s) divided by Population of neighbourhood(s)."
+                        },
+                        style="margin-left:6px; color:#888; cursor:pointer;"
+                    ),
+                    style="font-size: 14px; color: #444; margin-bottom: 4px;"
+                ),
+                ui.div(
+                    ui.output_ui("crime_rate"),
+                    style="font-size: 26px; font-weight: bold; line-height: 1;"
+                ),
                 class_="card border border-dark shadow-sm",
                 style="padding: 15px; height: 90px; display: flex; flex-direction: column; justify-content: center;"
             ),
             
             ui.div(
-                ui.div(fa.icon_svg("scale-balanced", width="16px", height="16px"), " Average Comparison", style="font-size: 14px; color: #444; margin-bottom: 4px;"),
-                ui.div(ui.output_ui("average_comparison"), style="font-size: 26px; font-weight: bold; line-height: 1;"),
+                ui.div(
+                    fa.icon_svg("scale-balanced", width="16px", height="16px"),
+                    " Average Comparison ",
+                    ui.span(
+                        fa.icon_svg("circle-info", width="12px", height="12px"),
+                        **{
+                            "data-bs-toggle": "tooltip",
+                            "data-bs-placement": "top",
+                            "title": "Shows how the selected neighbourhood(s) crime rate compares to the Vancouver average. Calculated as neighbourhood crime rate minus city crime rate."
+                        },
+                        style="margin-left:6px; color:#888; cursor:pointer;"
+                    ),
+                    style="font-size: 14px; color: #444; margin-bottom: 4px;"
+                ),
+                ui.div(
+                    ui.output_ui("average_comparison"),
+                    style="font-size: 26px; font-weight: bold; line-height: 1;"
+                ),
                 class_="card border border-dark shadow-sm",
                 style="padding: 15px; height: 90px; display: flex; flex-direction: column; justify-content: center;"
             ),
             
             ui.div(
-                ui.div(fa.icon_svg("shield-halved", width="16px", height="16px"), " Neighbourhood Safety Rank", style="font-size: 14px; color: #444; margin-bottom: 4px;"),
-                ui.div(ui.output_text("neighbourhood_rank"), style="font-size: 26px; font-weight: bold; line-height: 1;"),
+                ui.div(
+                    fa.icon_svg("scale-balanced", width="16px", height="16px"),
+                    " Neighbourhood Safety Rank ",
+                    ui.span(
+                        fa.icon_svg("circle-info", width="12px", height="12px"),
+                        **{
+                            "data-bs-toggle": "tooltip",
+                            "data-bs-placement": "top",
+                            "title": "Shows how the selected neighbourhood(s) crime rate ranks compared to other neighbourhoods in Vancouver."
+                        },
+                        style="margin-left:6px; color:#888; cursor:pointer;"
+                    ),
+                    style="font-size: 14px; color: #444; margin-bottom: 4px;"
+                ),
+                ui.div(
+                    ui.output_ui("neighbourhood_rank"),
+                    style="font-size: 26px; font-weight: bold; line-height: 1;"
+                ),
                 class_="card border border-dark shadow-sm",
                 style="padding: 15px; height: 90px; display: flex; flex-direction: column; justify-content: center;"
             ),
             fill=False,
             
             ),
+            ui.tags.style("""
+            .tooltip-left .tooltip-inner {
+                text-align: left;
+                max-width: 260px;
+            }
+            """),
             ui.layout_columns(
                 ui.div(
                     ui.div(
@@ -209,6 +275,22 @@ app_ui = ui.page_navbar(
                         ui.input_switch("show_heatmap", "Heatmap", True),
                         ui.input_switch("show_points", "Points", False),
                         ui.input_switch("show_rates", "Rate per 1,000", False),
+                        ui.span(
+                            fa.icon_svg("circle-info", width="12px", height="12px"),
+                            **{
+                                "data-bs-toggle": "tooltip",
+                                "data-bs-placement": "top",
+                                "data-bs-html": "true",
+                                "data-bs-custom-class": "tooltip-left",
+                                "title": """
+                                    Available map layers: <br>
+                                     - Heatmap: intensity based on number of incidents. <br>
+                                     - Points: reported incidents with additional information in tooltips (up to 2,000 points). <br>
+                                     - Rate per 1,000: neighbourhood heatmap normalized by population. <br>
+                                """
+                            },
+                            style="margin-left:6px; color:#888; cursor:pointer;"
+                        ),
                         style="""
                             display:flex;
                             gap:1rem;
@@ -220,10 +302,25 @@ app_ui = ui.page_navbar(
                             #white-space:nowrap;
                             #vertical-align:middle;
                             position:relative; top:10px;
-                        """
+                        """                        
                     ),
                     ui.card(
-                        ui.card_header(ui.strong("Crime Occurrences Across Neigbourhoods")),
+                        ui.card_header(
+                            ui.strong("Crime Occurrences Across Neigbourhoods"),
+                            ui.span(
+                                fa.icon_svg("circle-info", width="12px", height="12px"),
+                                **{
+                                    "data-bs-toggle": "tooltip",
+                                    "data-bs-placement": "top",
+                                    "data-bs-html": "true",
+                                    # "data-bs-custom-class": "tooltip-left",
+                                    "title": """
+                                        Map of Vancouver's neighbourhoods showing the selected layers.
+                                    """
+                                },
+                                style="margin-left:6px; color:#888; cursor:pointer;"
+                            ),
+                        ),
                         ui.output_ui("crime_map"),
                         full_screen=True,
                         style="height: 600px;"
@@ -232,7 +329,22 @@ app_ui = ui.page_navbar(
                 ), 
                 ui.div(
                     ui.card(
-                        ui.card_header(ui.strong("Top Crime Types")),
+                        ui.card_header(
+                            ui.strong("Top Crime Types"),
+                            ui.span(
+                                fa.icon_svg("circle-info", width="12px", height="12px"),
+                                **{
+                                    "data-bs-toggle": "tooltip",
+                                    "data-bs-placement": "top",
+                                    "data-bs-html": "true",
+                                    # "data-bs-custom-class": "tooltip-left",
+                                    "title": """
+                                        Shows the top 5 crime types using all filters except Crime Type.
+                                    """
+                                },
+                                style="margin-left:6px; color:#888; cursor:pointer;"
+                            ),
+                        ),
                         output_widget("top_crime_type_bar"),
                         full_screen=True,
                         style="""
@@ -241,7 +353,23 @@ app_ui = ui.page_navbar(
                         """
                     ),
                     ui.card(
-                        ui.card_header(ui.strong("Crime Occurrences By Time of Day")), 
+                        ui.card_header(ui.strong(
+                            "Crime Occurrences By Time of Day"),
+                            ui.span(
+                                fa.icon_svg("circle-info", width="12px", height="12px"),
+                                **{
+                                    "data-bs-toggle": "tooltip",
+                                    "data-bs-placement": "top",
+                                    "data-bs-html": "true",
+                                    # "data-bs-custom-class": "tooltip-left",
+                                    "title": """
+                                        Shows the distribution of reported incidents across times of the day. <br>
+                                        Ignores the Time of Day filter.
+                                    """
+                                },
+                                style="margin-left:6px; color:#888; cursor:pointer;"
+                            ),
+                        ), 
                         output_widget("time_of_day_plot"),
                         padding=0,
                         full_screen=True,
@@ -261,6 +389,16 @@ app_ui = ui.page_navbar(
                 fill=True
             ),
         ),
+        ui.tags.script("""
+            document.addEventListener("DOMContentLoaded", function() {
+                var tooltipTriggerList = [].slice.call(
+                    document.querySelectorAll('[data-bs-toggle="tooltip"]')
+                );
+                tooltipTriggerList.map(function (el) {
+                    return new bootstrap.Tooltip(el);
+                });
+            });
+            """),
         value = "main_dashboard",
     ),
     ui.nav_panel(
@@ -353,7 +491,11 @@ def server(input, output, session):
     
     @reactive.calc
     def filtered_data():
-        return get_filtered_data(crime_df, resolve_filter(input.nb()), resolve_filter(input.crime_type()), resolve_filter(input.month()), resolve_filter(input.daily_time()))
+        return get_filtered_data(
+            filter_nb=input.nb(), 
+            filter_crime=input.crime_type(), 
+            filter_month=input.month(), 
+            filter_time=input.daily_time())
     
     @reactive.calc
     def filtered_population():
@@ -371,7 +513,10 @@ def server(input, output, session):
         if nb_values is None or len(nb_values) > 1:
             return None
             
-        df = get_filtered_data(crime_df, resolve_filter(input.crime_type()), resolve_filter(input.month()), resolve_filter(input.daily_time()))
+        df = get_filtered_data(
+            filter_crime=input.crime_type(), 
+            filter_month=input.month(), 
+            filter_time=input.daily_time())
         nb = nb_values[0]
         
         crime_counts = df.groupby("NEIGHBOURHOOD").size()
@@ -400,15 +545,35 @@ def server(input, output, session):
     @render.ui
     def average_comparison():
         nb_values = resolve_filter(input.nb())
-        city_avg = len(crime_df) / population_df["POPULATION"].sum() * 100
+        city_crime_filtered = get_filtered_data(
+            filter_crime=input.crime_type(), 
+            filter_month=input.month(), 
+            filter_time=input.daily_time()
+            )
+        city_avg = len(city_crime_filtered) / population_df["POPULATION"].sum() * 100
         
         if nb_values is None:
             return ui.span(ui.span(f"{city_avg:.2f}%", style="color: black"))
         
         neighbourhood_rate = int(len(filtered_data())) / filtered_population() * 100 if filtered_population() > 0 else 0
-        comparison_val = neighbourhood_rate - city_avg
-        color = "green" if comparison_val < 0 else "red"
-        return ui.span(f"{comparison_val:.2f}%", style=f"color: {color}")
+        comparison_val = round(neighbourhood_rate, 2) - round(city_avg, 2)
+        if comparison_val > 0:
+            color = "red"
+            direction = "up"
+        elif comparison_val < 0:
+            color = "green"
+            direction = "down"
+        else:
+            color = None
+            direction = None
+
+        icon_html = f'<i class="fa fa-caret-{direction}"></i> ' if direction else ""
+        style_str = f"color: {color};" if color else ""
+
+        return ui.span(
+            ui.HTML(f"{icon_html}{abs(comparison_val):.2f}%"),
+            style=style_str
+        )
     
     @render.text
     def neighbourhood_rank():
@@ -417,7 +582,10 @@ def server(input, output, session):
     
     @reactive.calc
     def data_for_time_of_day_plot():
-        df = get_filtered_data(crime_df, resolve_filter(input.nb()), resolve_filter(input.crime_type()), resolve_filter(input.month()))
+        df = get_filtered_data(
+            filter_nb=input.nb(), 
+            filter_crime=input.crime_type(), 
+            filter_month=input.month())
         return df
         
         
@@ -520,7 +688,11 @@ def server(input, output, session):
     
     @reactive.calc
     def filetered_data_no_crime_type():
-        df = get_filtered_data(crime_df, resolve_filter(input.nb()), resolve_filter(input.month()), resolve_filter(input.daily_time()))
+        df = get_filtered_data(
+            filter_nb=input.nb(), 
+            filter_month=input.month(), 
+            filter_time=input.daily_time()
+        )
         return df
 
     @reactive.calc

@@ -1,17 +1,25 @@
-## [0.4.0]
+## [0.4.0] - 2026-03-17
 
 ### Added
 - Integrated MongoDB Atlas to log each querychat interaction, capturing the user query, LLM response, SQL generated, row count, and timestamp. Logs are displayed as a live table in the LLM Chat page and are downloadable as CSV. Logging failures are handled gracefully and will not break the UI. [#148](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/148)
+- Unit test and UI tests (through Playwright) to test core functionality of the dashboard [#129](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/129)
+- Added informational tool tips explaning metrics and how they are calculated for KPI metris [#144](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/144)
 
 ### Changed
 
 ### Fixed
+- **Feedback prioritization issue link:** [#112](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/issues/112)
+- Average crime rate comparison was not applying filters in calculation [#143](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/143)
+- Average crime rate comparison showing up and down arrows instead of + and - for better user experience and clearer definition of metric [#143](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/143)
 
 ### Known Issues
 
 ### Release Highlight
 
 ### Collaboration
+- **CONTRIBUTING.md:** [#145](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/145)
+- **M3 retrospective:** Adopted a structured workflow by developing each feature in its own branch and merging changes incrementally into the development branch. Additionally, prioritise finalising specifications and design decisions before implementation to ensure clear alignment on requirements and expected functionality.
+- **M4:** Improve code maintainability by refactoring duplicated logic into shared reusable functions. At the same time, define clearer functionality descriptions and user stories upfront to ensure a common understanding of requirements before development starts.
 
 ### Reflection
 
