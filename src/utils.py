@@ -31,23 +31,22 @@ def get_filtered_data(
     filter_time = resolve_filter(filter_time)
 
     where_clause = []
-    params = []  # To bind values to query (for ? notation)
 
     if filter_nb:
-        where_clause.append("NEIGHBOURHOOD IN (?)")
-        params.append(filter_nb)
+        ids = ", ".join(f"'{p}'" for p in filter_nb)
+        where_clause.append(f"NEIGHBOURHOOD IN ({ids})")
             
     if filter_crime:
-        where_clause.append("TYPE IN (?)")
-        params.append(filter_crime)
+        ids = ", ".join(f"'{p}'" for p in filter_crime)
+        where_clause.append(f"TYPE IN ({ids})")
             
     if filter_month:
-        where_clause.append("MONTH_NAME IN (?)")
-        params.append(filter_month)
+        ids = ", ".join(f"'{p}'" for p in filter_month)
+        where_clause.append(f"MONTH_NAME IN ({ids})")
             
     if filter_time:
-        where_clause.append("TIME_OF_DAY IN (?)")
-        params.append(filter_time)
+        ids = ", ".join(f"'{p}'" for p in filter_time)
+        where_clause.append(f"TIME_OF_DAY IN ({ids})")
 
     sql = f"""
         SELECT * 
@@ -57,6 +56,6 @@ def get_filtered_data(
     if where_clause:
         sql += " WHERE " + " AND ".join(where_clause)
 
-    df = con.execute(sql, params).df()
+    df = con.execute(sql).df()
             
     return df

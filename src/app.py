@@ -313,7 +313,7 @@ def server(input, output, session):
     
     @reactive.calc
     def filtered_data():
-        return get_filtered_data(crime_df, resolve_filter(input.nb()), resolve_filter(input.crime_type()), resolve_filter(input.month()), resolve_filter(input.daily_time()))
+        return get_filtered_data(input.nb(), input.crime_type(), input.month(), input.daily_time())
     
     @reactive.calc
     def filtered_population():
@@ -331,7 +331,7 @@ def server(input, output, session):
         if nb_values is None or len(nb_values) > 1:
             return None
             
-        df = get_filtered_data(crime_df, resolve_filter(input.crime_type()), resolve_filter(input.month()), resolve_filter(input.daily_time()))
+        df = get_filtered_data(input.crime_type(), input.month(), input.daily_time())
         nb = nb_values[0]
         
         crime_counts = df.groupby("NEIGHBOURHOOD").size()
@@ -377,7 +377,7 @@ def server(input, output, session):
     
     @reactive.calc
     def data_for_time_of_day_plot():
-        df = get_filtered_data(crime_df, resolve_filter(input.nb()), resolve_filter(input.crime_type()), resolve_filter(input.month()))
+        df = get_filtered_data(input.nb(), input.crime_type(), input.month())
         return df
         
         
@@ -480,7 +480,11 @@ def server(input, output, session):
     
     @reactive.calc
     def filetered_data_no_crime_type():
-        df = get_filtered_data(crime_df, resolve_filter(input.nb()), resolve_filter(input.month()), resolve_filter(input.daily_time()))
+        df = get_filtered_data(
+            filter_nb=input.nb(), 
+            filter_month=input.month(), 
+            filter_time=input.daily_time()
+        )
         return df
 
     @reactive.calc
