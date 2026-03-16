@@ -1,5 +1,6 @@
 import duckdb
 
+# Load main data source as parquet
 PARQUET_FILE = "data/processed/van_crime_data_2025.parquet"
 
 con = duckdb.connect()
@@ -59,3 +60,29 @@ def get_filtered_data(
     df = con.execute(sql).df()
             
     return df
+
+def get_neighbourhoods():
+    
+    sql = f"""
+        SELECT DISTINCT NEIGHBOURHOOD 
+        FROM read_parquet('{PARQUET_FILE}')
+        ORDER BY NEIGHBOURHOOD ASC
+    """
+    
+    results = con.execute(sql).df()["NEIGHBOURHOOD"].tolist()
+    #print(results)
+
+    return results
+
+def get_crime_types():
+    
+    sql = f"""
+        SELECT DISTINCT TYPE 
+        FROM read_parquet('{PARQUET_FILE}')
+        ORDER BY TYPE ASC
+    """
+    
+    results = con.execute(sql).df()["TYPE"].tolist()
+    #print(results)
+
+    return results
