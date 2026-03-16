@@ -83,7 +83,7 @@ pytest --browser firefox
 
 ## Miscellaneous
 
-In case you need to generate the main data file again, plese follow these steps:
+If you need to regenerate the main data source file, follow these steps:
 
 1. Preprocess the raw crime data:
 
