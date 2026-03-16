@@ -60,11 +60,7 @@ header = ui.div(
         style="margin-bottom:4px; font-weight:600;"
     ),
     ui.p(
-        "Compare crime patterns across Vancouver neighbourhoods",
-        style="margin-bottom:2px;"
-    ),
-    ui.p(
-        "Explore where incidents cluster, which crime types are most common, and when they happen.",
+        "Explore where incidents clustered across Vancouver in 2025, which crime types were most common, and when they occurred.",
         style="margin-bottom:0; color:rgba(255,255,255,0.85);"
     ),
     style="""
