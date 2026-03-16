@@ -81,6 +81,21 @@ Then, run the tests with:
 pytest --browser firefox
 ```
 
+## Miscellaneous
+
+In case you need to generate the main data file again, plese follow these steps:
+
+1. Preprocess the raw crime data:
+
+``` bash
+python src/1_data_preprocessing.py
+```
+
+2. Convert the preprocessed data into parquet file for DuckDB:
+``` bash
+python src/2_crime_data_to_parquet.py
+```
+
 ## Data Attribution
 This project uses dataset provided by the City of Vancouver and the Vancouver Police Department.
 
