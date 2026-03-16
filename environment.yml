@@ -42,3 +42,4 @@ dependencies:
       - querychat==0.5.1
       - chatlas==0.15.2
       - anthropic==0.84.0
+      - pymongo==4.16.0

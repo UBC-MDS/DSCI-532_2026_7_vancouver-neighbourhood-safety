@@ -25,14 +25,21 @@ api_key = os.getenv("ANTHROPIC_API_KEY")
 _client = MongoClient(os.getenv("MONGODB_URI"))
 collection = _client["van_safety_logs"]["query_log"]  # change db name if needed
 
-SCHEMA = ["session_id", "timestamp", "tool", "user_query", "sql", "n_rows"]
+SCHEMA = ["timestamp", "tool", "user_query", "llm_response", "sql", "n_rows"]
 
 def save_info(row: dict) -> None:
-    collection.insert_one(row)
+    try:
+        collection.insert_one(row)
+    except Exception as e:
+        print(f"[MongoDB logging error] {e}")
 
-def load_data(session_id: str) -> pd.DataFrame:
-    rows = list(collection.find({"session_id": session_id}, {"_id": 0}))
-    return pd.DataFrame(rows, columns=SCHEMA) if rows else pd.DataFrame(columns=SCHEMA)
+def load_data() -> pd.DataFrame:
+    try:
+        rows = list(collection.find({}, {"_id": 0}))
+        return pd.DataFrame(rows, columns=SCHEMA) if rows else pd.DataFrame(columns=SCHEMA)
+    except Exception as e:
+        print(f"[MongoDB load error] {e}")
+        return pd.DataFrame(columns=SCHEMA) 
 
 
 # ── Data Ingestion ────────────────────────────────────────
@@ -261,17 +268,17 @@ app_ui = ui.page_navbar(
     ),
     ui.nav_panel(
         "LLM Chat",
-        # ui.tags.style("""
-        #     shiny-chat-container.querychat shiny-chat-messages {
-        #         max-height: 85vh;
-        #         overflow-y: auto;
-        #     }
-        #     shiny-chat-container.querychat {
-        #         height: auto !important;
-        #         flex: 0 1 auto !important;
-        #     }
+        ui.tags.style("""
+            shiny-chat-container.querychat shiny-chat-messages {
+                max-height: 79vh;
+                overflow-y: auto;
+            }
+            shiny-chat-container.querychat {
+                height: auto !important;
+                flex: 0 1 auto !important;
+            }
 
-        # """),
+        """),
         ui.layout_sidebar(
             qc.sidebar(),
             ui.card(
@@ -327,7 +334,7 @@ app_ui = ui.page_navbar(
             ui.card_header("Query Log (MongoDB Atlas)"),
             ui.download_button("download_log", "Download CSV"),
             ui.output_data_frame("log_table"),
-            max_height="300px",
+            max_height="500px",
         ),
             
             fillable=True,
@@ -746,9 +753,9 @@ def server(input, output, session):
         return ui.HTML(m._repr_html_())
     
     qc_vals = qc.server()
-    session_id = session.id
+    #session_id = session.id
 
-    log = reactive.value(load_data(session.id))
+    log = reactive.value(load_data())
     pending = reactive.value(None)   
 
     def on_query(req):
@@ -760,8 +767,10 @@ def server(input, output, session):
             return
         turns = qc_vals.client.get_turns()
         user_turns = [t for t in turns if t.role == "user"]
+        assistant_turns = [t for t in turns if t.role == "assistant"]
         pending.set({
             "user_query" : user_turns[-1].text if user_turns else "(unknown)",
+            "llm_response": assistant_turns[-1].text if assistant_turns else "(unknown)",
             "sql": sql,
             "tool": req.name,
         })
@@ -773,17 +782,12 @@ def server(input, output, session):
         entry = pending()
         if not entry:
             return
-        entry["session_id"] = session_id
+        #entry["session_id"] = session_id
         entry["n_rows"] = len(qc_vals.df())    
         entry["timestamp"] = datetime.now().isoformat(timespec="seconds")
         save_info(entry)
         log.set(pd.concat([log(), pd.DataFrame([entry])], ignore_index=True))
         pending.set(None)                      
-
-    # @reactive.effect
-    # def reload_log_on_section():
-    #     """Reload log from MongoDB when section selector changes."""
-    #     log.set(load_data(input.section()))
 
     @render.data_frame
     def log_table():
