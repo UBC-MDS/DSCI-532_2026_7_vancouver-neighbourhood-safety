@@ -335,7 +335,23 @@ app_ui = ui.page_navbar(
                         """
                     ),
                     ui.card(
-                        ui.card_header(ui.strong("Crime Occurrences By Time of Day")), 
+                        ui.card_header(ui.strong(
+                            "Crime Occurrences By Time of Day"),
+                            ui.span(
+                                fa.icon_svg("circle-info", width="12px", height="12px"),
+                                **{
+                                    "data-bs-toggle": "tooltip",
+                                    "data-bs-placement": "top",
+                                    "data-bs-html": "true",
+                                    # "data-bs-custom-class": "tooltip-left",
+                                    "title": """
+                                        Shows the distribution of reported incidents across times of the day. <br>
+                                        Ignores the Time of Day filter.
+                                    """
+                                },
+                                style="margin-left:6px; color:#888; cursor:pointer;"
+                            ),
+                        ), 
                         output_widget("time_of_day_plot"),
                         padding=0,
                         full_screen=True,
