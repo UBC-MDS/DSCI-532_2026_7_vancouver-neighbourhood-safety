@@ -14,12 +14,11 @@ from dotenv import load_dotenv
 from pymongo import MongoClient
 from datetime import datetime
 import os
-from utils import resolve_filter, get_filtered_data
+from .utils import resolve_filter, get_filtered_data
 
 load_dotenv()
 
 api_key = os.getenv("ANTHROPIC_API_KEY")
-
 
 # ── Persistent storage: MongoDB Atlas ────────────────────────────────────────
 _client = MongoClient(os.getenv("MONGODB_URI"))
@@ -41,9 +40,7 @@ def load_data() -> pd.DataFrame:
         print(f"[MongoDB load error] {e}")
         return pd.DataFrame(columns=SCHEMA) 
 
-
-# ── Data Ingestion ────────────────────────────────────────
-crime_df = pd.read_csv("data/processed/processed_vancouver_crime_data_2025.csv")
+# Load support population data
 population_df = pd.read_csv("data/raw/van_pop_2016.csv")
 
 # Load neighbourhood polygons
