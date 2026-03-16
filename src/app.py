@@ -151,29 +151,93 @@ app_ui = ui.page_navbar(
             ####################################################################################################
             ui.layout_columns(
             ui.div(
-                ui.div(fa.icon_svg("file-invoice", width="16px", height="16px"), " Reported Incidents", style="font-size: 14px; color: #444; margin-bottom: 4px;"),
-                ui.div(ui.output_text("crime_count"), style="font-size: 26px; font-weight: bold; line-height: 1;"),
+                ui.div(
+                    fa.icon_svg("scale-balanced", width="16px", height="16px"),
+                    " Reported Incidents ",
+                    ui.span(
+                        fa.icon_svg("circle-info", width="12px", height="12px"),
+                        **{
+                            "data-bs-toggle": "tooltip",
+                            "data-bs-placement": "top",
+                            "title": "Shows total number of reported incidents in the selected neighbourhood(s) based on the filters applied."
+                        },
+                        style="margin-left:6px; color:#888; cursor:pointer;"
+                    ),
+                    style="font-size: 14px; color: #444; margin-bottom: 4px;"
+                ),
+                ui.div(
+                    ui.output_ui("crime_count"),
+                    style="font-size: 26px; font-weight: bold; line-height: 1;"
+                ),
                 class_="card border border-dark shadow-sm",
                 style="padding: 15px; height: 90px; display: flex; flex-direction: column; justify-content: center;"
             ),
             
             ui.div(
-                ui.div(fa.icon_svg("chart-line", width="16px", height="16px"), " Crime Rate", style="font-size: 14px; color: #444; margin-bottom: 4px;"),
-                ui.div(ui.output_text("crime_rate"), style="font-size: 26px; font-weight: bold; line-height: 1;"),
+                ui.div(
+                    fa.icon_svg("scale-balanced", width="16px", height="16px"),
+                    " Crime Rate ",
+                    ui.span(
+                        fa.icon_svg("circle-info", width="12px", height="12px"),
+                        **{
+                            "data-bs-toggle": "tooltip",
+                            "data-bs-placement": "top",
+                            "title": "Shows crime rate of the selected neighbourhood(s). Calculated as Total crimes in neighbourhood(s) divided by Population of neighbourhood(s)."
+                        },
+                        style="margin-left:6px; color:#888; cursor:pointer;"
+                    ),
+                    style="font-size: 14px; color: #444; margin-bottom: 4px;"
+                ),
+                ui.div(
+                    ui.output_ui("crime_rate"),
+                    style="font-size: 26px; font-weight: bold; line-height: 1;"
+                ),
                 class_="card border border-dark shadow-sm",
                 style="padding: 15px; height: 90px; display: flex; flex-direction: column; justify-content: center;"
             ),
             
             ui.div(
-                ui.div(fa.icon_svg("scale-balanced", width="16px", height="16px"), " Average Comparison", style="font-size: 14px; color: #444; margin-bottom: 4px;"),
-                ui.div(ui.output_ui("average_comparison"), style="font-size: 26px; font-weight: bold; line-height: 1;"),
+                ui.div(
+                    fa.icon_svg("scale-balanced", width="16px", height="16px"),
+                    " Average Comparison ",
+                    ui.span(
+                        fa.icon_svg("circle-info", width="12px", height="12px"),
+                        **{
+                            "data-bs-toggle": "tooltip",
+                            "data-bs-placement": "top",
+                            "title": "Shows how the selected neighbourhood(s) crime rate compares to the Vancouver average. Calculated as neighbourhood crime rate minus city crime rate."
+                        },
+                        style="margin-left:6px; color:#888; cursor:pointer;"
+                    ),
+                    style="font-size: 14px; color: #444; margin-bottom: 4px;"
+                ),
+                ui.div(
+                    ui.output_ui("average_comparison"),
+                    style="font-size: 26px; font-weight: bold; line-height: 1;"
+                ),
                 class_="card border border-dark shadow-sm",
                 style="padding: 15px; height: 90px; display: flex; flex-direction: column; justify-content: center;"
             ),
             
             ui.div(
-                ui.div(fa.icon_svg("shield-halved", width="16px", height="16px"), " Neighbourhood Safety Rank", style="font-size: 14px; color: #444; margin-bottom: 4px;"),
-                ui.div(ui.output_text("neighbourhood_rank"), style="font-size: 26px; font-weight: bold; line-height: 1;"),
+                ui.div(
+                    fa.icon_svg("scale-balanced", width="16px", height="16px"),
+                    " Neighbourhood Safety Rank ",
+                    ui.span(
+                        fa.icon_svg("circle-info", width="12px", height="12px"),
+                        **{
+                            "data-bs-toggle": "tooltip",
+                            "data-bs-placement": "top",
+                            "title": "Shows how the selected neighbourhood(s) crime rate ranks compared to other neighbourhoods in Vancouver."
+                        },
+                        style="margin-left:6px; color:#888; cursor:pointer;"
+                    ),
+                    style="font-size: 14px; color: #444; margin-bottom: 4px;"
+                ),
+                ui.div(
+                    ui.output_ui("neighbourhood_rank"),
+                    style="font-size: 26px; font-weight: bold; line-height: 1;"
+                ),
                 class_="card border border-dark shadow-sm",
                 style="padding: 15px; height: 90px; display: flex; flex-direction: column; justify-content: center;"
             ),
@@ -239,6 +303,16 @@ app_ui = ui.page_navbar(
                 fill=True
             ),
         ),
+        ui.tags.script("""
+            document.addEventListener("DOMContentLoaded", function() {
+                var tooltipTriggerList = [].slice.call(
+                    document.querySelectorAll('[data-bs-toggle="tooltip"]')
+                );
+                tooltipTriggerList.map(function (el) {
+                    return new bootstrap.Tooltip(el);
+                });
+            });
+            """),
         value = "main_dashboard",
     ),
     ui.nav_panel(
@@ -366,9 +440,24 @@ def server(input, output, session):
             return ui.span(ui.span(f"{city_avg:.2f}%", style="color: black"))
         
         neighbourhood_rate = int(len(filtered_data())) / filtered_population() * 100 if filtered_population() > 0 else 0
-        comparison_val = neighbourhood_rate - city_avg
-        color = "green" if comparison_val < 0 else "red"
-        return ui.span(f"{comparison_val:.2f}%", style=f"color: {color}")
+        comparison_val = round(neighbourhood_rate, 2) - round(city_avg, 2)
+        if comparison_val > 0:
+            color = "red"
+            direction = "up"
+        elif comparison_val < 0:
+            color = "green"
+            direction = "down"
+        else:
+            color = None
+            direction = None
+
+        icon_html = f'<i class="fa fa-caret-{direction}"></i> ' if direction else ""
+        style_str = f"color: {color};" if color else ""
+
+        return ui.span(
+            ui.HTML(f"{icon_html}{abs(comparison_val):.2f}%"),
+            style=style_str
+        )
     
     @render.text
     def neighbourhood_rank():
