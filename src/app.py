@@ -312,7 +312,20 @@ app_ui = ui.page_navbar(
                 ui.div(
                     ui.card(
                         ui.card_header(
-                            ui.strong("Top Crime Types")
+                            ui.strong("Top Crime Types"),
+                            ui.span(
+                                fa.icon_svg("circle-info", width="12px", height="12px"),
+                                **{
+                                    "data-bs-toggle": "tooltip",
+                                    "data-bs-placement": "top",
+                                    "data-bs-html": "true",
+                                    # "data-bs-custom-class": "tooltip-left",
+                                    "title": """
+                                        Shows the top 5 crime types using all filters except Crime Type.
+                                    """
+                                },
+                                style="margin-left:6px; color:#888; cursor:pointer;"
+                            ),
                         ),
                         output_widget("top_crime_type_bar"),
                         full_screen=True,
