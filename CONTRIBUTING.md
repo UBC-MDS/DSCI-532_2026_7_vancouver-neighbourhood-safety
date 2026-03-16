@@ -43,7 +43,8 @@ abide by its terms.
 For M4, as a team we agreed to:
 - Refactor duplicated logic into reusable functions and organise them within shared utility scripts.
 - Write clearer and more descriptive functionality summaries and user stories to ensure requirements are well understood before development begins.
-- Communicate frequently to monitor progress, align on shared components, and mention when introducing or updating common functions.
+- Use a dedicated branch for each feature, merging into the development branch through regular, incremental commits rather than large, infrequent updates.
+- Prioritise completing specification and design discussions before beginning implementation to ensure alignment on requirements and expected functionality.
 
 ### Attribution
 These contributing guidelines were adapted from the [dplyr contributing guidelines](https://github.com/tidyverse/dplyr/blob/master/.github/CONTRIBUTING.md).
