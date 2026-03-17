@@ -1,3 +1,50 @@
+## [0.4.0] - 2026-03-17
+
+### Added
+- Integrated MongoDB Atlas to log each querychat interaction, capturing the user query, LLM response, SQL generated, row count, and timestamp. Logs are displayed as a live table in the LLM Chat page and are downloadable as CSV. Logging failures are handled gracefully and will not break the UI. [#148](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/148)
+- Unit test and UI tests (through Playwright) to test core functionality of the dashboard [#129](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/129)
+- Added informational tool tips explaning metrics and how they are calculated for KPI metris [#144](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/144)
+- Added centralized DuckDB-based data access using Parquet files with a unified get_filtered_data() function for reactive filtering. (#142)[https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/142]
+- Added contextual tooltips across filters, map layers, and charts to improve usability and explain dashboard functionality. [#150](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/150)
+- Added overview tooltip in the dashboard header describing dataset scope (Vancouver, 2025) and example analytical questions. [#152](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/152)
+- Include motivation for default filter configuration (Downtown, West End, Break and Enter Residential/Other) as tooltip. (#151)[https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/151]
+- Created `query_log_analysis.ipynb` to demonstrate the value of MongoDB query logging, including analysis of user intent, high-interest neighbourhoods, data gaps, and LLM prompt improvement opportunities. (161)[https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/161]
+- Enhanced the chatbot interface by integrating responsive Top 5 and Time of Day visualizations. (159)[https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/159]
+
+
+### Changed
+- Rearrange the Dashboard and LLM Chat tabs. (#137)[https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/137]
+- Replaced the donut chart with a single stacked horizontal bar chart for the "Crime Occurrences By Time of Day" visualization. This improves readability and makes proportional comparisons across Morning, Afternoon, and Evening/Night categories more intuitive at a glance. (158)[https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/158]
+
+### Fixed
+- **Feedback prioritization issue link:** [#112](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/issues/112)
+- Average crime rate comparison was not applying filters in calculation [#143](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/143)
+- Average crime rate comparison showing up and down arrows instead of + and - for better user experience and clearer definition of metric [#143](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/143)
+- Fix Posit integration error after modularizing code. [#136](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/136)
+
+### Known Issues
+
+### Release Highlight
+
+### Collaboration
+- **CONTRIBUTING.md:** [#145](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/145)
+- **M3 retrospective:** Adopted a structured workflow by developing each feature in its own branch and merging changes incrementally into the development branch. Additionally, prioritise finalising specifications and design decisions before implementation to ensure clear alignment on requirements and expected functionality.
+- **M4:** Improve code maintainability by refactoring duplicated logic into shared reusable functions. At the same time, define clearer functionality descriptions and user stories upfront to ensure a common understanding of requirements before development starts.
+
+### Reflection
+
+# Testing Plan
+
+# Testing Plan
+
+| Test function | Test type | Description | What could break |
+|--------------|----------|-------------|------------------|
+| test_sidebar_filters | UI test | Verifies that filters update correctly when selections are changed | Renaming input IDs, changing filter UI components or defaults, or altering dashboard navigation |
+| test_clear_filters_button | UI test | Checks that clicking the "Clear All Filters" button resets sidebar filters to an empty state | Changing button ID, modifying reset logic, or altering reactive update behaviour |
+| test_map_layer_switches | UI test | Ensures that map layer toggle switches change state correctly when interacted with | Renaming switch inputs, changing default states, or redesigning map layer controls |
+| test_download_button | UI test | Verifies that the download button is visible in the LLM Chat tab with the correct label | Changing button ID or label, moving/removing the button, or restructuring the chat layout |
+| test_filter_neighbourhood | Unit test | Ensures filtering by neighbourhood returns only matching rows | Changing filtering logic, dataframe column names, or how empty filters are handled |
+| test_filter_multiple_conditions | Unit test | Ensures multiple filters are applied simultaneously to return the correct subset | Changing filter interaction logic (e.g., union vs intersection) or altering category values |
 
 
 ## [0.3.0]

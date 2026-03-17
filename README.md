@@ -9,7 +9,7 @@ Both the *development* and the *stable* versions of this dashboard can be access
 [Development version](https://019c928e-e698-6cad-eba8-b45208bebd6f.share.connect.posit.cloud/)
 
 ## Demo
-![gif](./img/vancouver-neighbourhood-safety.gif)
+![gif](./img/demo.gif)
 
 ## User Guide
 
@@ -58,11 +58,43 @@ conda activate vc_safety2
 
 To render the app, navigate to the root of the project directory and run:
 
+Note: The traditional "shyny run ..." command may fail due to the required adjustems for importing app modules. Please use the following command.
+
 ``` bash
-shiny run src/app.py
+shiny run --reload src.app
 ```
 
 Open http://127.0.0.1:8000 in a web browser
+
+## To run the tests
+
+You can run the tests for this package using `pytest`. First, install the environment if you have not already done previously:
+
+``` bash
+conda env create -f environment.yml
+conda activate vc_safety2
+```
+
+Then, run the tests with:
+
+```         
+pytest --browser firefox
+```
+
+## Miscellaneous
+
+If you need to regenerate the main data source file, follow these steps:
+
+1. Preprocess the raw crime data:
+
+``` bash
+python src/1_data_preprocessing.py
+```
+
+2. Convert the preprocessed data into parquet file for DuckDB:
+``` bash
+python src/2_crime_data_to_parquet.py
+```
 
 ## Data Attribution
 This project uses dataset provided by the City of Vancouver and the Vancouver Police Department.
