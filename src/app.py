@@ -490,6 +490,31 @@ app_ui = ui.page_navbar(
         header_LLM,
         ui.layout_sidebar(
             qc.sidebar(),
+            ui.layout_columns(
+                    ui.card(
+                        ui.card_header(ui.strong("Top Crime Types")),
+                        output_widget("chat_top_crime_type_bar"),
+                        full_screen=True,
+                        style="""
+                            height: 320px;
+                            flex-grow: 1 1 0;
+                        """
+                    ),
+                    ui.card(
+                        ui.card_header(ui.strong("Crime Occurrences By Time of Day")), 
+                        ui.card_body(
+                            output_widget("chat_time_of_day_plot"),
+                            style="padding-top: 80px;"
+                        ),
+                        padding=0,
+                        full_screen=True,
+                        style="""
+                            height: 320px;
+                            flex-grow: 1 1 0;
+                        """
+                    ),
+                    col_widths=[6, 6],
+                ),
             ui.card(
                 ui.card_header(
                     ui.output_text("title"),
@@ -498,53 +523,15 @@ app_ui = ui.page_navbar(
                     class_="d-flex justify-content-between align-items-center"
                     ),
                 ui.output_data_frame("data_table"),
+                max_height="500px",
                 fill=True,
-            ),
-            ui.layout_columns(
-                ui.card(
-                    ui.div(
-                        "Incidents Found",
-                        style="font-size:0.9rem; color:#666; line-height:1; margin-bottom:0.2rem;"
-                    ),
-                    ui.div(
-                        ui.output_text("chat_crime_count"),
-                        style="font-size:1.4rem; font-weight:600; line-height:1;"
-                    ),
-                    class_="border border-dark shadow-sm",
-                    style="height:100px; padding:0rem 0rem; overflow:hidden;"
-                ),
-                ui.card(
-                    ui.div(
-                        "Most Affected Neighbourhood",
-                        style="font-size:0.9rem; color:#666; line-height:1; margin-bottom:0.2rem;"
-                    ),
-                    ui.div(
-                        ui.output_text("chat_top_neighbourhood"),
-                        style="font-size:1.4rem; font-weight:600; line-height:1;"
-                    ),
-                    class_="border border-dark shadow-sm",
-                    style="height:100px; padding:0rem 0rem; overflow:hidden;"
-                ),
-                ui.card(
-                    ui.div(
-                        "Most Common Crime",
-                        style="font-size:0.9rem; color:#666; line-height:1; margin-bottom:0.2rem;"
-                    ),
-                    ui.div(
-                        ui.output_text("chat_top_crime"),
-                        style="font-size:1.4rem; font-weight:600; line-height:1;"
-                    ),
-                    class_="border border-dark shadow-sm",
-                    style="height:100px; padding:0rem 0rem; overflow:hidden;"
-                ),
-                fillable=False,
             ),
             ui.card(
             ui.card_header("Query Log (MongoDB Atlas)"),
             ui.download_button("download_log", "Download CSV"),
             ui.output_data_frame("log_table"),
             max_height="500px",
-        ),
+            ),
             
             fillable=True,
 
@@ -794,9 +781,8 @@ def server(input, output, session):
 
         return top
 
-    # @render.ui
-    @render_widget
-    def top_crime_type_bar():
+    
+    def make_top_crime_type_bar():
         top = top_crime_types()
 
         if top.empty:
@@ -844,6 +830,10 @@ def server(input, output, session):
         )
 
         return chart
+    
+    @render_widget
+    def top_crime_type_bar():
+        return make_top_crime_type_bar()
 
 
     @render.ui
