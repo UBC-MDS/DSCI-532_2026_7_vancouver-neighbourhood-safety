@@ -71,7 +71,7 @@ Disclaimer for running locally:
 
 To enable this feature locally, add your MongoDB URI to a `.env` file in the repository root:
 
-MONGODB_URI=<your_connection_string>
+`MONGODB_URI=<your_connection_string>`
 
 If not provided, the application will run without logging functionality but may show a timeout error.
 
