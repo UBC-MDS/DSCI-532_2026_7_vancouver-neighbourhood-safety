@@ -1,6 +1,7 @@
 ## [0.4.0] - 2026-03-17
 
 ### Added
+- Integrated MongoDB Atlas to log each querychat interaction, capturing the user query, LLM response, SQL generated, row count, and timestamp. Logs are displayed as a live table in the LLM Chat page and are downloadable as CSV. Logging failures are handled gracefully and will not break the UI. [#148](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/148)
 - Unit test and UI tests (through Playwright) to test core functionality of the dashboard [#129](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/129)
 - Added informational tool tips explaning metrics and how they are calculated for KPI metris [#144](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/144)
 - Added centralized DuckDB-based data access using Parquet files with a unified get_filtered_data() function for reactive filtering. (#142)[https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/142]

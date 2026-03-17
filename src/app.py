@@ -11,12 +11,34 @@ import faicons as fa
 import querychat
 from chatlas import ChatGithub, ChatAnthropic
 from dotenv import load_dotenv
+from pymongo import MongoClient
+from datetime import datetime
 import os
 from .utils import resolve_filter, get_filtered_data, get_neighbourhoods, get_crime_types
 
 load_dotenv()
 
 api_key = os.getenv("ANTHROPIC_API_KEY")
+
+# ── Persistent storage: MongoDB Atlas ────────────────────────────────────────
+_client = MongoClient(os.getenv("MONGODB_URI"))
+collection = _client["van_safety_logs"]["query_log"]  # change db name if needed
+
+SCHEMA = ["timestamp", "tool", "user_query", "llm_response", "sql", "n_rows"]
+
+def save_info(row: dict) -> None:
+    try:
+        collection.insert_one(row)
+    except Exception as e:
+        print(f"[MongoDB logging error] {e}")
+
+def load_data() -> pd.DataFrame:
+    try:
+        rows = list(collection.find({}, {"_id": 0}))
+        return pd.DataFrame(rows, columns=SCHEMA) if rows else pd.DataFrame(columns=SCHEMA)
+    except Exception as e:
+        print(f"[MongoDB load error] {e}")
+        return pd.DataFrame(columns=SCHEMA) 
 
 # Load support population data
 population_df = pd.read_csv("data/raw/van_pop_2016.csv")
@@ -445,6 +467,17 @@ app_ui = ui.page_navbar(
     ),
     ui.nav_panel(
         "LLM Chat",
+        ui.tags.style("""
+            shiny-chat-container.querychat shiny-chat-messages {
+                max-height: 79vh;
+                overflow-y: auto;
+            }
+            shiny-chat-container.querychat {
+                height: auto !important;
+                flex: 0 1 auto !important;
+            }
+
+        """),
         header_LLM,
         ui.layout_sidebar(
             qc.sidebar(),
@@ -497,6 +530,13 @@ app_ui = ui.page_navbar(
                 ),
                 fillable=False,
             ),
+            ui.card(
+            ui.card_header("Query Log (MongoDB Atlas)"),
+            ui.download_button("download_log", "Download CSV"),
+            ui.output_data_frame("log_table"),
+            max_height="500px",
+        ),
+            
             fillable=True,
 
         ),
@@ -947,7 +987,51 @@ def server(input, output, session):
         return ui.HTML(m._repr_html_())
     
     qc_vals = qc.server()
+    #session_id = session.id
 
+    log = reactive.value(load_data())
+    pending = reactive.value(None)   
+
+    def on_query(req):
+        """Fires inside Extended Task — only .set() is allowed here, no reactive reads."""
+        if req.name not in ("querychat_update_dashboard", "querychat_query"):
+            return
+        sql = req.arguments.get("query", "")
+        if not sql:
+            return
+        turns = qc_vals.client.get_turns()
+        user_turns = [t for t in turns if t.role == "user"]
+        assistant_turns = [t for t in turns if t.role == "assistant"]
+        pending.set({
+            "user_query" : user_turns[-1].text if user_turns else "(unknown)",
+            "llm_response": assistant_turns[-1].text if assistant_turns else "(unknown)",
+            "sql": sql,
+            "tool": req.name,
+        })
+
+    qc_vals.client.on_tool_request(on_query)
+
+    @reactive.effect
+    def flush_log():
+        entry = pending()
+        if not entry:
+            return
+        #entry["session_id"] = session_id
+        entry["n_rows"] = len(qc_vals.df())    
+        entry["timestamp"] = datetime.now().isoformat(timespec="seconds")
+        save_info(entry)
+        log.set(pd.concat([log(), pd.DataFrame([entry])], ignore_index=True))
+        pending.set(None)                      
+
+    @render.data_frame
+    def log_table():
+        return render.DataGrid(log(), width="100%")
+
+    @render.download(filename=lambda: f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_query_log.csv")
+    def download_log():
+        yield log().to_csv(index=False)
+
+    #______________________Previous Reactive Calculations_______________________
     @reactive.calc
     def query_df():
         return qc_vals.df()
