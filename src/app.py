@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 from pymongo import MongoClient
 from datetime import datetime
 import os
-from .utils import resolve_filter, get_filtered_data, get_neighbourhoods, get_crime_types
+from utils import resolve_filter, get_filtered_data, get_neighbourhoods, get_crime_types
 
 load_dotenv()
 
