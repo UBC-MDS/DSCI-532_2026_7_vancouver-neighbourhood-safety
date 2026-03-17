@@ -22,9 +22,10 @@
 | `neighbourhood_rank`      | Output    | `@render.text`           | `neighbourhood_rank_calc()`                              | #4        |
 | `crime_map`               | Output    | `@render.ui`             | `neighbourhood_rates()`, `input_nb`, `filtered_latlon`, `selected_neigh_bounds`| #1|
 | `top_crime_type_bar`      | Output    | `@render_widget`         | `top_crime_types()`                              | #1        |
+| `time_of_day_plot`      | Output    | `@render_widget`         | `data_for_time_of_day_plot()`                              | #1        |
 | `filtered_data`           | Reactive  | `@reactive.calc`         | `input_nb`, `input_crime_type`, `input_month`, `input_daily_time` | #1, #2, #3 |
 | `filtered_population`     | Reactive  | `@reactive.calc`         | `input_nb`                                               | #3        |
-| `neighbourhood_ranking`.  | Reactive  | `@reactive.calc`         | `input_crime_type`, `input_month`, `input_daily_time`, `input_nb`    | #4        |
+| `neighbourhood_ranking`  | Reactive  | `@reactive.calc`         | `input_crime_type`, `input_month`, `input_daily_time`, `input_nb`    | #4        |
 | `neighbourhood_rates`     | Reactive  | `@reactive.calc`         | `filtered_data()`                                          | #1        |
 | `filtered_latlon`         | Reactive  | `@reactive.calc`         | `filtered_data()`                                          | #1        |
 | `selected_neigh_bounds`   | Reactive  | `@reactive.calc`         | `filtered_data()`, `neigh_gdf`                             | #1        |

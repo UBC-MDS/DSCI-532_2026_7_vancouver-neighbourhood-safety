@@ -103,7 +103,13 @@ header = ui.div(
                 Use it to answer questions like:<br>
                 • Which areas have higher or lower crime levels?<br>
                 • What types of crime are most common?<br>
-                • At what times of day do incidents occur?
+                • At what times of day do incidents occur?<br><br>
+                <strong>How to use:</strong><br>
+                The dashboard is includes a sidebar for filters and 
+                a main panel for key metrics and visual summaries.<br><br>
+                Use the sidebar to filter by Neighbourhood, Crime Type, Month or Time of day.<br>
+                Selecting "All" shows all data, while selecting specific values narrows the results.<br><br>
+                Each component includes an info icon with additional details.
                 """
             },
             style="margin-left:8px; color:#ffffffcc; cursor:pointer; vertical-align:middle;"
@@ -208,10 +214,28 @@ app_ui = ui.page_navbar(
         header,
         ui.layout_sidebar(
             ui.sidebar(
-                ui.input_selectize("nb", "Neighbourhood",
+                ui.input_selectize(
+                    "nb",
+                    ui.span(
+                        "Neighbourhood",
+                        ui.span(
+                            fa.icon_svg("circle-info", width="12px", height="12px"),
+                            **{
+                                "data-bs-toggle": "tooltip",
+                                "data-bs-placement": "right",
+                                "data-bs-html": "true",
+                                "title": """
+                                Default filters highlight Downtown and West End, representing the most densely populated area of Vancouver.<br>
+                                The crime type defaults to Break and Enter Residential/Other to reflect the housing-focused user story.
+                                """
+                            },
+                            style="margin-left:6px; color:#6c757d; cursor:pointer; vertical-align:middle;"
+                        )
+                    ),
                     choices=neighbourhoods,
                     multiple=True,
-                    selected=["Downtown", "West End"]), 
+                    selected=["Downtown", "West End"]
+                ), 
                 ui.input_selectize("crime_type", "Crime Type",
                     choices=crime_types,
                     multiple=True,
@@ -440,7 +464,10 @@ app_ui = ui.page_navbar(
                                 style="margin-left:6px; color:#888; cursor:pointer;"
                             ),
                         ), 
-                        output_widget("time_of_day_plot"),
+                        ui.card_body(
+                            output_widget("time_of_day_plot"),
+                            style="padding-top: 80px;"
+                        ),
                         padding=0,
                         full_screen=True,
                         style="""
@@ -487,6 +514,31 @@ app_ui = ui.page_navbar(
         header_LLM,
         ui.layout_sidebar(
             qc.sidebar(),
+            ui.layout_columns(
+                    ui.card(
+                        ui.card_header(ui.strong("Top Crime Types")),
+                        output_widget("chat_top_crime_type_bar"),
+                        full_screen=True,
+                        style="""
+                            height: 320px;
+                            flex-grow: 1 1 0;
+                        """
+                    ),
+                    ui.card(
+                        ui.card_header(ui.strong("Crime Occurrences By Time of Day")), 
+                        ui.card_body(
+                            output_widget("chat_time_of_day_plot"),
+                            style="padding-top: 80px;"
+                        ),
+                        padding=0,
+                        full_screen=True,
+                        style="""
+                            height: 320px;
+                            flex-grow: 1 1 0;
+                        """
+                    ),
+                    col_widths=[6, 6],
+                ),
             ui.card(
                 ui.card_header(
                     ui.output_text("title"),
@@ -495,53 +547,15 @@ app_ui = ui.page_navbar(
                     class_="d-flex justify-content-between align-items-center"
                     ),
                 ui.output_data_frame("data_table"),
+                max_height="500px",
                 fill=True,
-            ),
-            ui.layout_columns(
-                ui.card(
-                    ui.div(
-                        "Incidents Found",
-                        style="font-size:0.9rem; color:#666; line-height:1; margin-bottom:0.2rem;"
-                    ),
-                    ui.div(
-                        ui.output_text("chat_crime_count"),
-                        style="font-size:1.4rem; font-weight:600; line-height:1;"
-                    ),
-                    class_="border border-dark shadow-sm",
-                    style="height:100px; padding:0rem 0rem; overflow:hidden;"
-                ),
-                ui.card(
-                    ui.div(
-                        "Most Affected Neighbourhood",
-                        style="font-size:0.9rem; color:#666; line-height:1; margin-bottom:0.2rem;"
-                    ),
-                    ui.div(
-                        ui.output_text("chat_top_neighbourhood"),
-                        style="font-size:1.4rem; font-weight:600; line-height:1;"
-                    ),
-                    class_="border border-dark shadow-sm",
-                    style="height:100px; padding:0rem 0rem; overflow:hidden;"
-                ),
-                ui.card(
-                    ui.div(
-                        "Most Common Crime",
-                        style="font-size:0.9rem; color:#666; line-height:1; margin-bottom:0.2rem;"
-                    ),
-                    ui.div(
-                        ui.output_text("chat_top_crime"),
-                        style="font-size:1.4rem; font-weight:600; line-height:1;"
-                    ),
-                    class_="border border-dark shadow-sm",
-                    style="height:100px; padding:0rem 0rem; overflow:hidden;"
-                ),
-                fillable=False,
             ),
             ui.card(
             ui.card_header("Query Log (MongoDB Atlas)"),
             ui.download_button("download_log", "Download CSV"),
             ui.output_data_frame("log_table"),
             max_height="500px",
-        ),
+            ),
             
             fillable=True,
 
@@ -659,12 +673,10 @@ def server(input, output, session):
             filter_month=input.month())
         return df
         
+    def make_time_of_day_plot(df):
         
-    @render_widget
-    def time_of_day_plot():
-        df = data_for_time_of_day_plot()
-        
-        custom_color = ["#fb8500", "#023047", "#669bbc"]
+        time_order = ["Morning", "Afternoon", "Evening/Night"]
+        custom_color = ["#669bbc", "#fb8500", "#023047"]
 
         base = alt.Chart(df).transform_aggregate(
             count='count()',
@@ -673,29 +685,43 @@ def server(input, output, session):
             total='sum(count)'
         ).transform_calculate(
             percent='datum.count / datum.total',
-            full_label='datum.TIME_OF_DAY + ": " + format(datum.percent, ".0%")'
-
-        ).encode(
-            theta=alt.Theta('count:Q', stack=True),
-            color=alt.Color('TIME_OF_DAY:N', scale=alt.Scale(range=custom_color), legend=None),
-            tooltip=[alt.Tooltip('TIME_OF_DAY:N', title='Time of Day'), alt.Tooltip('percent:Q', format='.1%', title='Percentage'), alt.Tooltip('count:Q', format=',', title='Count')]
+            sort_order='datum.TIME_OF_DAY === "Morning" ? 0 : datum.TIME_OF_DAY === "Afternoon" ? 1 : 2'
+        )
+        chart = base.mark_bar(height=50).encode(
+            x=alt.X('count:Q', stack='normalize', axis=None),
+            color=alt.Color(
+                'TIME_OF_DAY:N',
+                scale=alt.Scale(domain=time_order, range=custom_color),
+                legend=None
+            ),
+            order=alt.Order('sort_order:Q', sort='ascending'),
+            tooltip=[
+                alt.Tooltip('TIME_OF_DAY:N', title='Time of Day'),
+                alt.Tooltip('percent:Q', format='.1%', title='Percentage'),
+                alt.Tooltip('count:Q', format=',', title='Count')
+            ]
+        )
+        text = base.mark_text(dy=-40, size=11, fontWeight='bold').encode(
+            x=alt.X('count:Q', stack='normalize', bandPosition=0.5),
+            text='TIME_OF_DAY:N',
+            color=alt.value('#333333'),
+            order=alt.Order('sort_order:Q', sort='ascending'),
         )
 
-        slices = base.mark_arc(innerRadius=30, outerRadius=60)
-
-
-        text = base.mark_text(radius=100, size=11, align='center', baseline='bottom').encode(
-            text='full_label:N'
-        )
-        
-        pie_chart = (text + slices).configure_view(
-            stroke=None 
+        return (chart + text).configure_view(
+            stroke=None
         ).properties(
-            height="container",
-            width="container",
-        )
-
-        return pie_chart
+            height=80,
+            width="container"
+        ).configure_concat(
+            spacing=0
+        )   
+        
+        
+    @render_widget
+    def time_of_day_plot():
+        df = data_for_time_of_day_plot()
+        return make_time_of_day_plot(df)
 
     @reactive.calc
     def filtered_latlon():
@@ -779,10 +805,8 @@ def server(input, output, session):
 
         return top
 
-    # @render.ui
-    @render_widget
-    def top_crime_type_bar():
-        top = top_crime_types()
+    
+    def make_top_crime_type_bar(top):
 
         if top.empty:
             return alt.Chart(pd.DataFrame({"msg": ["No data for current filters"]})).mark_text(size=14).encode(text="msg:N")
@@ -821,14 +845,16 @@ def server(input, output, session):
             .properties(
                 height="container",
                 width="container",
-                title=alt.TitleParams(
-                    text="(All filters except Crime Type)",
-                ),
             )
             .configure_title(fontSize=12)
         )
 
         return chart
+    
+    @render_widget
+    def top_crime_type_bar():
+        top = top_crime_types()
+        return make_top_crime_type_bar(top)
 
 
     @render.ui
@@ -1055,38 +1081,15 @@ def server(input, output, session):
         df = query_df()
         yield df.to_csv(index=False)
 
-    @render.text
-    def chat_crime_count():
+    @render_widget
+    def chat_top_crime_type_bar():
         df = query_df()
-        if df.empty:
-            return "N/A"
-        return str(len(df))
-    
-    @render.text
-    def chat_top_neighbourhood():
-        df = query_df()
-        if df.empty:
-            return "N/A"
-        top = (
-            df.groupby("NEIGHBOURHOOD")
-            .size()
-            .sort_values(ascending=False)
-            .index[0]
-        )
-        return str(top)
-    
-    @render.text
-    def chat_top_crime():
-        df = query_df()
-        if df.empty:
-            return "N/A"
-        top = (
-            df.groupby("TYPE")
-            .size()
-            .sort_values(ascending=False)
-            .index[0]
-        )
-        return str(top)
+        top = df.groupby("TYPE").size().sort_values(ascending=False).head(5)
+        return make_top_crime_type_bar(top) 
+
+    @render_widget
+    def chat_time_of_day_plot():
+        return make_time_of_day_plot(query_df())      
     
 
 app = App(app_ui, server=server)
