@@ -23,6 +23,13 @@
 - Fix Posit integration error after modularizing code. [#136](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/136)
 
 ### Known Issues
+- LLM Chat logging requires a MongoDB connection.
+
+To enable this feature locally, add your MongoDB URI to a `.env` file in the repository root:
+
+MONGODB_URI=<your_connection_string>
+
+If not provided, the application will run without logging functionality but may show a timeout error.
 
 ### Release Highlight
 The MongoDB query log captures every interaction a user has with the LLM-powered querychat interface. This data serves three core purposes:
