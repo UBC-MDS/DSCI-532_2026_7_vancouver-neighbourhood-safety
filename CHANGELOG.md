@@ -8,6 +8,7 @@
 - Added contextual tooltips across filters, map layers, and charts to improve usability and explain dashboard functionality. [#150](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/150)
 - Added overview tooltip in the dashboard header describing dataset scope (Vancouver, 2025) and example analytical questions. [#152](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/152)
 - Include motivation for default filter configuration (Downtown, West End, Break and Enter Residential/Other) as tooltip. (#151)[https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/151]
+- Created `query_log_analysis.ipynb` to demonstrate the value of MongoDB query logging, including analysis of user intent, high-interest neighbourhoods, data gaps, and LLM prompt improvement opportunities. (161)[https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/161]
 - Enhanced the chatbot interface by integrating responsive Top 5 and Time of Day visualizations. (159)[https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/159]
 
 
