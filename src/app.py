@@ -208,10 +208,28 @@ app_ui = ui.page_navbar(
         header,
         ui.layout_sidebar(
             ui.sidebar(
-                ui.input_selectize("nb", "Neighbourhood",
+                ui.input_selectize(
+                    "nb",
+                    ui.span(
+                        "Neighbourhood",
+                        ui.span(
+                            fa.icon_svg("circle-info", width="12px", height="12px"),
+                            **{
+                                "data-bs-toggle": "tooltip",
+                                "data-bs-placement": "right",
+                                "data-bs-html": "true",
+                                "title": """
+                                Default filters highlight Downtown and West End, representing the most densely populated area of Vancouver.<br>
+                                The crime type defaults to Break and Enter Residential/Other to reflect the housing-focused user story.
+                                """
+                            },
+                            style="margin-left:6px; color:#6c757d; cursor:pointer; vertical-align:middle;"
+                        )
+                    ),
                     choices=neighbourhoods,
                     multiple=True,
-                    selected=["Downtown", "West End"]), 
+                    selected=["Downtown", "West End"]
+                ), 
                 ui.input_selectize("crime_type", "Crime Type",
                     choices=crime_types,
                     multiple=True,
