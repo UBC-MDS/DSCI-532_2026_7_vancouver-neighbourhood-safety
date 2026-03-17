@@ -649,8 +649,7 @@ def server(input, output, session):
             filter_month=input.month())
         return df
         
-    def make_time_of_day_plot():
-        df = data_for_time_of_day_plot()
+    def make_time_of_day_plot(df):
         
         time_order = ["Morning", "Afternoon", "Evening/Night"]
         custom_color = ["#669bbc", "#fb8500", "#023047"]
@@ -697,7 +696,8 @@ def server(input, output, session):
         
     @render_widget
     def time_of_day_plot():
-        return make_time_of_day_plot()
+        df = data_for_time_of_day_plot()
+        return make_time_of_day_plot(df)
 
     @reactive.calc
     def filtered_latlon():
@@ -782,8 +782,7 @@ def server(input, output, session):
         return top
 
     
-    def make_top_crime_type_bar():
-        top = top_crime_types()
+    def make_top_crime_type_bar(top):
 
         if top.empty:
             return alt.Chart(pd.DataFrame({"msg": ["No data for current filters"]})).mark_text(size=14).encode(text="msg:N")
@@ -833,7 +832,8 @@ def server(input, output, session):
     
     @render_widget
     def top_crime_type_bar():
-        return make_top_crime_type_bar()
+        top = top_crime_types()
+        return make_top_crime_type_bar(top)
 
 
     @render.ui
@@ -1062,11 +1062,13 @@ def server(input, output, session):
 
     @render_widget
     def chat_top_crime_type_bar():
-        return make_top_crime_type_bar() 
+        df = query_df()
+        top = df.groupby("TYPE").size().sort_values(ascending=False).head(5)
+        return make_top_crime_type_bar(top) 
 
     @render_widget
     def chat_time_of_day_plot():
-        return make_time_of_day_plot()      
+        return make_time_of_day_plot(query_df())      
     
 
 app = App(app_ui, server=server)
