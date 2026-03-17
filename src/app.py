@@ -100,6 +100,43 @@ header = ui.div(
     """
 )
 
+header_LLM = ui.div(
+    ui.div(
+        ui.h2(
+            "🍁 Vancouver Neighbourhood Safety",
+            style="margin-bottom:0; font-weight:600;"
+        ),
+        ui.span(
+            fa.icon_svg("circle-info", width="13px", height="13px"),
+            **{
+                "data-bs-toggle": "tooltip",
+                "data-bs-placement": "right",
+                "data-bs-html": "true",
+                "data-bs-custom-class": "tooltip-left",
+                "title": """
+                <strong>LLM Chat:</strong><br>
+                Ask open-ended questions about crime data across Vancouver neighbourhoods in 2025.<br>
+                Use natural language to filter, explore, and summarize incidents based on location, time, and type.
+                """
+            },
+            style="margin-left:8px; color:#ffffffcc; cursor:pointer; vertical-align:middle;"
+        ),
+        style="""
+            display:flex;
+            align-items:center;
+            gap:0.4rem;
+        """
+    ),
+    style="""
+        background-color:#023047;
+        color:white;
+        padding:16px 20px;
+        border-radius:8px;
+        margin-bottom:14px;
+        border-bottom:4px solid #fb8500;
+    """
+)
+
 qc = querychat.QueryChat(
     get_filtered_data(),   # Retrieve all data, using DuckDB
     "VancouverNeighbourhoodSafety",
@@ -408,7 +445,7 @@ app_ui = ui.page_navbar(
     ),
     ui.nav_panel(
         "LLM Chat",
-        header,
+        header_LLM,
         ui.layout_sidebar(
             qc.sidebar(),
             ui.card(
