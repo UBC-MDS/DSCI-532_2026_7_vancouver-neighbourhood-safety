@@ -12,6 +12,7 @@
 
 ### Changed
 - Rearrange the Dashboard and LLM Chat tabs. (#137)[https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/137]
+- Replaced the donut chart with a single stacked horizontal bar chart for the "Crime Occurrences By Time of Day" visualization. This improves readability and makes proportional comparisons across Morning, Afternoon, and Evening/Night categories more intuitive at a glance. (158)[https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/158]
 
 ### Fixed
 - **Feedback prioritization issue link:** [#112](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/issues/112)
