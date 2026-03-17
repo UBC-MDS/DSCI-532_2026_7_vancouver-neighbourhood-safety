@@ -821,9 +821,6 @@ def server(input, output, session):
             .properties(
                 height="container",
                 width="container",
-                title=alt.TitleParams(
-                    text="(All filters except Crime Type)",
-                ),
             )
             .configure_title(fontSize=12)
         )
