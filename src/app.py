@@ -464,7 +464,10 @@ app_ui = ui.page_navbar(
                                 style="margin-left:6px; color:#888; cursor:pointer;"
                             ),
                         ), 
-                        output_widget("time_of_day_plot"),
+                        ui.card_body(
+                            output_widget("time_of_day_plot"),
+                            style="padding-top: 80px;"
+                        ),
                         padding=0,
                         full_screen=True,
                         style="""
@@ -683,12 +686,11 @@ def server(input, output, session):
             filter_month=input.month())
         return df
         
-        
-    @render_widget
-    def time_of_day_plot():
+    def make_time_of_day_plot():
         df = data_for_time_of_day_plot()
         
-        custom_color = ["#fb8500", "#023047", "#669bbc"]
+        time_order = ["Morning", "Afternoon", "Evening/Night"]
+        custom_color = ["#669bbc", "#fb8500", "#023047"]
 
         base = alt.Chart(df).transform_aggregate(
             count='count()',
@@ -697,29 +699,42 @@ def server(input, output, session):
             total='sum(count)'
         ).transform_calculate(
             percent='datum.count / datum.total',
-            full_label='datum.TIME_OF_DAY + ": " + format(datum.percent, ".0%")'
-
-        ).encode(
-            theta=alt.Theta('count:Q', stack=True),
-            color=alt.Color('TIME_OF_DAY:N', scale=alt.Scale(range=custom_color), legend=None),
-            tooltip=[alt.Tooltip('TIME_OF_DAY:N', title='Time of Day'), alt.Tooltip('percent:Q', format='.1%', title='Percentage'), alt.Tooltip('count:Q', format=',', title='Count')]
+            sort_order='datum.TIME_OF_DAY === "Morning" ? 0 : datum.TIME_OF_DAY === "Afternoon" ? 1 : 2'
+        )
+        chart = base.mark_bar(height=50).encode(
+            x=alt.X('count:Q', stack='normalize', axis=None),
+            color=alt.Color(
+                'TIME_OF_DAY:N',
+                scale=alt.Scale(domain=time_order, range=custom_color),
+                legend=None
+            ),
+            order=alt.Order('sort_order:Q', sort='ascending'),
+            tooltip=[
+                alt.Tooltip('TIME_OF_DAY:N', title='Time of Day'),
+                alt.Tooltip('percent:Q', format='.1%', title='Percentage'),
+                alt.Tooltip('count:Q', format=',', title='Count')
+            ]
+        )
+        text = base.mark_text(dy=-40, size=11, fontWeight='bold').encode(
+            x=alt.X('count:Q', stack='normalize', bandPosition=0.5),
+            text='TIME_OF_DAY:N',
+            color=alt.value('#333333'),
+            order=alt.Order('sort_order:Q', sort='ascending'),
         )
 
-        slices = base.mark_arc(innerRadius=30, outerRadius=60)
-
-
-        text = base.mark_text(radius=100, size=11, align='center', baseline='bottom').encode(
-            text='full_label:N'
-        )
-        
-        pie_chart = (text + slices).configure_view(
-            stroke=None 
+        return (chart + text).configure_view(
+            stroke=None
         ).properties(
-            height="container",
-            width="container",
-        )
-
-        return pie_chart
+            height=80,
+            width="container"
+        ).configure_concat(
+            spacing=0
+        )   
+        
+        
+    @render_widget
+    def time_of_day_plot():
+        return make_time_of_day_plot()
 
     @reactive.calc
     def filtered_latlon():
