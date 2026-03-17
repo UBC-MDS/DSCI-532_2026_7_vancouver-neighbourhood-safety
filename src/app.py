@@ -55,9 +55,36 @@ def neigh_style_selected(_feature):
 
 
 header = ui.div(
-    ui.h2(
-        "🍁 Vancouver Neighbourhood Safety",
-        style="margin-bottom:4px; font-weight:600;"
+    # Title + tooltip (same row)
+    ui.div(
+        ui.h2(
+            "🍁 Vancouver Neighbourhood Safety",
+            style="margin-bottom:0; font-weight:600;"
+        ),
+        ui.span(
+            fa.icon_svg("circle-info", width="13px", height="13px"),
+            **{
+                "data-bs-toggle": "tooltip",
+                "data-bs-placement": "right",
+                "data-bs-html": "true",
+                "data-bs-custom-class": "tooltip-left",
+                "title": """
+                <strong>Overview</strong><br>
+                This dashboard helps you explore crime patterns across Vancouver neighbourhoods in 2025.<br><br>
+                It highlights where incidents cluster, which types are most common, and when they occur.<br><br>
+                Use it to answer questions like:<br>
+                • Which areas have higher or lower crime levels?<br>
+                • What types of crime are most common?<br>
+                • At what times of day do incidents occur?
+                """
+            },
+            style="margin-left:8px; color:#ffffffcc; cursor:pointer; vertical-align:middle;"
+        ),
+        style="""
+            display:flex;
+            align-items:center;
+            gap:0.4rem;
+        """
     ),
     ui.p(
         "Explore where incidents clustered across Vancouver in 2025, which crime types were most common, and when they occurred.",
