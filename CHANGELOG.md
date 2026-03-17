@@ -4,13 +4,20 @@
 - Integrated MongoDB Atlas to log each querychat interaction, capturing the user query, LLM response, SQL generated, row count, and timestamp. Logs are displayed as a live table in the LLM Chat page and are downloadable as CSV. Logging failures are handled gracefully and will not break the UI. [#148](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/148)
 - Unit test and UI tests (through Playwright) to test core functionality of the dashboard [#129](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/129)
 - Added informational tool tips explaning metrics and how they are calculated for KPI metris [#144](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/144)
+- Added centralized DuckDB-based data access using Parquet files with a unified get_filtered_data() function for reactive filtering. (#142)[https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/142]
+- Added contextual tooltips across filters, map layers, and charts to improve usability and explain dashboard functionality. [#150](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/150)
+- Added overview tooltip in the dashboard header describing dataset scope (Vancouver, 2025) and example analytical questions. [#152](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/152)
+- Include motivation for default filter configuration (Downtown, West End, Break and Enter Residential/Other) as tooltip. (#151)[https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/151]
+
 
 ### Changed
+- Rearrange the Dashboard and LLM Chat tabs. (#137)[https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/137]
 
 ### Fixed
 - **Feedback prioritization issue link:** [#112](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/issues/112)
 - Average crime rate comparison was not applying filters in calculation [#143](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/143)
 - Average crime rate comparison showing up and down arrows instead of + and - for better user experience and clearer definition of metric [#143](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/143)
+- Fix Posit integration error after modularizing code. [#136](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/136)
 
 ### Known Issues
 
