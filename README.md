@@ -66,6 +66,15 @@ shiny run --reload src.app
 
 Open http://127.0.0.1:8000 in a web browser
 
+Disclaimer for running locally:
+- LLM Chat logging requires a MongoDB connection.
+
+To enable this feature locally, add your MongoDB URI to a `.env` file in the repository root:
+
+`MONGODB_URI=<your_connection_string>`
+
+If not provided, the application will run without logging functionality but may show a timeout error.
+
 ## To run the tests
 
 You can run the tests for this package using `pytest`. First, install the environment if you have not already done previously:
