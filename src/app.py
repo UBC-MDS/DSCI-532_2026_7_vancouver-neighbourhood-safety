@@ -97,7 +97,13 @@ header = ui.div(
                 Use it to answer questions like:<br>
                 • Which areas have higher or lower crime levels?<br>
                 • What types of crime are most common?<br>
-                • At what times of day do incidents occur?
+                • At what times of day do incidents occur?<br><br>
+                <strong>How to use:</strong><br>
+                The dashboard is includes a sidebar for filters and 
+                a main panel for key metrics and visual summaries.<br><br>
+                Use the sidebar to filter by Neighbourhood, Crime Type, Month or Time of day.<br>
+                Selecting "All" shows all data, while selecting specific values narrows the results.<br><br>
+                Each component includes an info icon with additional details.
                 """
             },
             style="margin-left:8px; color:#ffffffcc; cursor:pointer; vertical-align:middle;"
