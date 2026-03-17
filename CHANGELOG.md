@@ -23,8 +23,25 @@
 - Fix Posit integration error after modularizing code. [#136](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/136)
 
 ### Known Issues
+- LLM Chat logging requires a MongoDB connection.
+
+To enable this feature locally, add your MongoDB URI to a `.env` file in the repository root:
+
+MONGODB_URI=<your_connection_string>
+
+If not provided, the application will run without logging functionality but may show a timeout error.
 
 ### Release Highlight
+The MongoDB query log captures every interaction a user has with the LLM-powered querychat interface. This data serves three core purposes:
+- Understand user intent: By analyzing the natural language queries, we learn what questions users actually have about Vancouver crime, not what we assumed they would ask. This directly informs future feature development and data collection priorities.
+- Identify Desirous (High-Interest) Neighbourhoods: By extracting neighbourhood mentions from queries and generated SQL, we can identify which areas users are most curious about and prioritize those in future dashboard enhancements.
+- Identify data gaps: When n_rows = 0, the query returned no results. Patterns in empty-result queries reveal gaps in our dataset or limitations in how the LLM translates questions to SQL.
+- Improve the LLM prompt: By reviewing user_query vs sql pairs, we can identify cases where the LLM misunderstood the user and refine the system prompt accordingly.
+
+- **Option chosen:** B
+- **PR:** [161](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/161)
+- **Why this option over the others:** We chose this option over the others as we wanted to use this data gathered from users to help further fine-tune our main dashboard to provide better insights.
+- **Feature prioritization issue link:** [#160](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/issues/160)
 
 ### Collaboration
 - **CONTRIBUTING.md:** [#145](https://github.com/UBC-MDS/DSCI-532_2026_7_vancouver-neighbourhood-safety/pull/145)
@@ -32,8 +49,9 @@
 - **M4:** Improve code maintainability by refactoring duplicated logic into shared reusable functions. At the same time, define clearer functionality descriptions and user stories upfront to ensure a common understanding of requirements before development starts.
 
 ### Reflection
-
-# Testing Plan
+- The dashboard effectively enables users to explore Vancouver neighbourhood crime patterns through interactive filters, KPI summaries, and map visualizations. The addition of the LLM chat interface further supports exploratory analysis by allowing users to ask open-ended questions and retrieve filtered summaries or insights. Overall, the dashboard performs well in presenting normalized crime rates and comparative indicators that help users quickly interpret relative neighbourhood safety.
+- We prioritised addressing critical feedback related to functionality that could lead to incorrect or misleading insights. In particular, we focused on refining metric calculations, comparison logic, and data filtering behaviour to ensure that the dashboard outputs were analytically sound and consistent with user expectations. By resolving these issues first, we aimed to strengthen the reliability and interpretability of the dashboard before implementing additional visual or usability enhancements.
+- The material that was most helpful for this milestone was the content on working with Parquet files and implementing Playwright testing, as it supported more efficient data handling and improved the reliability of automated testing of the dashboard.
 
 # Testing Plan
 
