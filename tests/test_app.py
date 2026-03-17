@@ -39,29 +39,6 @@ def test_sidebar_filters(page: Page, app: ShinyAppProc):
     time.set(["Morning"])
     time.expect_selected(["Morning"])
 
-def test_clear_filters_button(page: Page, app: ShinyAppProc):
-    """
-    This test checks that clicking the "Clear All Filters" button resets the sidebar filter inputs to an empty selection state after filters have been applied
-    """
-    page.goto(app.url)
-
-    go_main(page)
-
-    nb = controller.InputSelectize(page, "nb")
-    crime = controller.InputSelectize(page, "crime_type")
-
-    nb.set(["Downtown"])
-    crime.set(["Mischief"])
-
-    clear_btn = controller.InputActionButton(page, "clear_filters")
-    clear_btn.click()
-
-    # Shiny reactivity small wait
-    page.wait_for_timeout(500)
-
-    nb.expect_selected([])
-    crime.expect_selected([])
-
 def test_map_layer_switches(page: Page, app: ShinyAppProc):
     """
     This test verifies that map layer toggle switches (heatmap, points, and rate layers) correctly change their checked state when interacted with

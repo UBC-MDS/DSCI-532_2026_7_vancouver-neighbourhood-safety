@@ -14,6 +14,12 @@ from dotenv import load_dotenv
 from pymongo import MongoClient
 from datetime import datetime
 import os
+import sys
+from pathlib import Path
+
+if __package__ is None or __package__ == "":
+    sys.path.append(str(Path(__file__).resolve().parent.parent))
+    __package__ = "src"
 from .utils import resolve_filter, get_filtered_data, get_neighbourhoods, get_crime_types
 
 load_dotenv()
