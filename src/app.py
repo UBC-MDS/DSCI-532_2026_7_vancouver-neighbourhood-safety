@@ -1060,38 +1060,13 @@ def server(input, output, session):
         df = query_df()
         yield df.to_csv(index=False)
 
-    @render.text
-    def chat_crime_count():
-        df = query_df()
-        if df.empty:
-            return "N/A"
-        return str(len(df))
-    
-    @render.text
-    def chat_top_neighbourhood():
-        df = query_df()
-        if df.empty:
-            return "N/A"
-        top = (
-            df.groupby("NEIGHBOURHOOD")
-            .size()
-            .sort_values(ascending=False)
-            .index[0]
-        )
-        return str(top)
-    
-    @render.text
-    def chat_top_crime():
-        df = query_df()
-        if df.empty:
-            return "N/A"
-        top = (
-            df.groupby("TYPE")
-            .size()
-            .sort_values(ascending=False)
-            .index[0]
-        )
-        return str(top)
+    @render_widget
+    def chat_top_crime_type_bar():
+        return make_top_crime_type_bar() 
+
+    @render_widget
+    def chat_time_of_day_plot():
+        return make_time_of_day_plot()      
     
 
 app = App(app_ui, server=server)
