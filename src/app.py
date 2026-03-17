@@ -514,6 +514,31 @@ app_ui = ui.page_navbar(
         header_LLM,
         ui.layout_sidebar(
             qc.sidebar(),
+            ui.layout_columns(
+                    ui.card(
+                        ui.card_header(ui.strong("Top Crime Types")),
+                        output_widget("chat_top_crime_type_bar"),
+                        full_screen=True,
+                        style="""
+                            height: 320px;
+                            flex-grow: 1 1 0;
+                        """
+                    ),
+                    ui.card(
+                        ui.card_header(ui.strong("Crime Occurrences By Time of Day")), 
+                        ui.card_body(
+                            output_widget("chat_time_of_day_plot"),
+                            style="padding-top: 80px;"
+                        ),
+                        padding=0,
+                        full_screen=True,
+                        style="""
+                            height: 320px;
+                            flex-grow: 1 1 0;
+                        """
+                    ),
+                    col_widths=[6, 6],
+                ),
             ui.card(
                 ui.card_header(
                     ui.output_text("title"),
@@ -522,53 +547,15 @@ app_ui = ui.page_navbar(
                     class_="d-flex justify-content-between align-items-center"
                     ),
                 ui.output_data_frame("data_table"),
+                max_height="500px",
                 fill=True,
-            ),
-            ui.layout_columns(
-                ui.card(
-                    ui.div(
-                        "Incidents Found",
-                        style="font-size:0.9rem; color:#666; line-height:1; margin-bottom:0.2rem;"
-                    ),
-                    ui.div(
-                        ui.output_text("chat_crime_count"),
-                        style="font-size:1.4rem; font-weight:600; line-height:1;"
-                    ),
-                    class_="border border-dark shadow-sm",
-                    style="height:100px; padding:0rem 0rem; overflow:hidden;"
-                ),
-                ui.card(
-                    ui.div(
-                        "Most Affected Neighbourhood",
-                        style="font-size:0.9rem; color:#666; line-height:1; margin-bottom:0.2rem;"
-                    ),
-                    ui.div(
-                        ui.output_text("chat_top_neighbourhood"),
-                        style="font-size:1.4rem; font-weight:600; line-height:1;"
-                    ),
-                    class_="border border-dark shadow-sm",
-                    style="height:100px; padding:0rem 0rem; overflow:hidden;"
-                ),
-                ui.card(
-                    ui.div(
-                        "Most Common Crime",
-                        style="font-size:0.9rem; color:#666; line-height:1; margin-bottom:0.2rem;"
-                    ),
-                    ui.div(
-                        ui.output_text("chat_top_crime"),
-                        style="font-size:1.4rem; font-weight:600; line-height:1;"
-                    ),
-                    class_="border border-dark shadow-sm",
-                    style="height:100px; padding:0rem 0rem; overflow:hidden;"
-                ),
-                fillable=False,
             ),
             ui.card(
             ui.card_header("Query Log (MongoDB Atlas)"),
             ui.download_button("download_log", "Download CSV"),
             ui.output_data_frame("log_table"),
             max_height="500px",
-        ),
+            ),
             
             fillable=True,
 
@@ -686,8 +673,7 @@ def server(input, output, session):
             filter_month=input.month())
         return df
         
-    def make_time_of_day_plot():
-        df = data_for_time_of_day_plot()
+    def make_time_of_day_plot(df):
         
         time_order = ["Morning", "Afternoon", "Evening/Night"]
         custom_color = ["#669bbc", "#fb8500", "#023047"]
@@ -734,7 +720,8 @@ def server(input, output, session):
         
     @render_widget
     def time_of_day_plot():
-        return make_time_of_day_plot()
+        df = data_for_time_of_day_plot()
+        return make_time_of_day_plot(df)
 
     @reactive.calc
     def filtered_latlon():
@@ -818,10 +805,8 @@ def server(input, output, session):
 
         return top
 
-    # @render.ui
-    @render_widget
-    def top_crime_type_bar():
-        top = top_crime_types()
+    
+    def make_top_crime_type_bar(top):
 
         if top.empty:
             return alt.Chart(pd.DataFrame({"msg": ["No data for current filters"]})).mark_text(size=14).encode(text="msg:N")
@@ -860,14 +845,16 @@ def server(input, output, session):
             .properties(
                 height="container",
                 width="container",
-                title=alt.TitleParams(
-                    text="(All filters except Crime Type)",
-                ),
             )
             .configure_title(fontSize=12)
         )
 
         return chart
+    
+    @render_widget
+    def top_crime_type_bar():
+        top = top_crime_types()
+        return make_top_crime_type_bar(top)
 
 
     @render.ui
@@ -1094,38 +1081,15 @@ def server(input, output, session):
         df = query_df()
         yield df.to_csv(index=False)
 
-    @render.text
-    def chat_crime_count():
+    @render_widget
+    def chat_top_crime_type_bar():
         df = query_df()
-        if df.empty:
-            return "N/A"
-        return str(len(df))
-    
-    @render.text
-    def chat_top_neighbourhood():
-        df = query_df()
-        if df.empty:
-            return "N/A"
-        top = (
-            df.groupby("NEIGHBOURHOOD")
-            .size()
-            .sort_values(ascending=False)
-            .index[0]
-        )
-        return str(top)
-    
-    @render.text
-    def chat_top_crime():
-        df = query_df()
-        if df.empty:
-            return "N/A"
-        top = (
-            df.groupby("TYPE")
-            .size()
-            .sort_values(ascending=False)
-            .index[0]
-        )
-        return str(top)
+        top = df.groupby("TYPE").size().sort_values(ascending=False).head(5)
+        return make_top_crime_type_bar(top) 
+
+    @render_widget
+    def chat_time_of_day_plot():
+        return make_time_of_day_plot(query_df())      
     
 
 app = App(app_ui, server=server)
