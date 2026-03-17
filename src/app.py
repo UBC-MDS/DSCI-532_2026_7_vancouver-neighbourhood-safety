@@ -408,6 +408,7 @@ app_ui = ui.page_navbar(
     ),
     ui.nav_panel(
         "LLM Chat",
+        header,
         ui.layout_sidebar(
             qc.sidebar(),
             ui.card(
